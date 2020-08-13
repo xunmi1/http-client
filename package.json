@@ -1,0 +1,32 @@
+{
+  "name": "@xunmi/http-client",
+  "version": "0.1.0",
+  "description": "An HTTP client based on the Fetch API.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build-ts": "tsc -p tsconfig.json",
+    "lint": "prettier --write --parser typescript \"**/*.ts\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xunmi1/http-client.git"
+  },
+  "author": "xunmi <xunmi1@outlook.com>",
+  "license": "MIT",
+  "sideEffects": false,
+  "keywords": [
+    "fetch",
+    "http",
+    "request"
+  ],
+  "bugs": {
+    "url": "https://github.com/xunmi1/http-client/issues"
+  },
+  "homepage": "https://github.com/xunmi1/http-client#readme",
+  "devDependencies": {
+    "@xunmi/prettier-config": "^1.0.1",
+    "prettier": "^2.0.5",
+    "typescript": "^3.9.7"
+  },
+  "prettier": "@xunmi/prettier-config"
+}
