@@ -14,7 +14,7 @@
     "sourceMap": false,
     "baseUrl": "./",
     "outDir": "dist",
-    "lib": ["ESNext"]
+    "lib": ["ESNext", "DOM"]
   },
   "include": ["src/*"]
 }

@@ -2,7 +2,7 @@ type TupleToUnion<T extends any[]> = T[number];
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never;
 
 type Next = () => Promise<any>;
-type Middleware<T> = (context: unknown, next: Next) => Promise<T>;
+type Middleware<T> = (context: any, next: Next) => Promise<T>;
 
 type Composed<T extends any[]> = (context: unknown, next?: Next) => UnionToIntersection<ReturnType<TupleToUnion<T>>>;
 
