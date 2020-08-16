@@ -1,37 +1,32 @@
 import { RequestOptions } from './interfaces';
 
-type Overwrite<T, R> = Omit<T, keyof R> & R;
-
-interface ContextParams extends RequestOptions {
+// Since the properties of `Request` are read-only, use `RequestOptions`
+interface ContextRequest extends RequestOptions {
   url: string;
+  params: URLSearchParams;
+  headers: Headers;
 }
-
-interface OverwriteOptions {
-  headers: Headers,
-  params: URLSearchParams,
-}
-export type ContextOptions = Overwrite<ContextParams, OverwriteOptions>;
 
 interface ContextResponse extends Response {
   data?: any;
 }
 
 class Context {
-  public readonly options: ContextOptions;
+  public readonly request: ContextRequest;
   public response?: ContextResponse;
 
-  constructor(options: ContextParams) {
-    const headers = new Headers(options.headers);
+  constructor(url: string, options: RequestOptions) {
     const params = new URLSearchParams(options.params);
-    this.options = { ...options, headers, params };
+    const headers = new Headers(options.headers);
+    this.request = { ...options, url, params, headers };
   }
 
   get url() {
-    return this.options.url;
+    return this.request.url;
   }
 
   get method() {
-    return this.options.method;
+    return this.request.method;
   }
 
   get status() {

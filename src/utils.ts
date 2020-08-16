@@ -10,16 +10,19 @@ export const mergeOptions = (global: RequestOptions = {}, options: RequestOption
   merged.headers = mergeHeaders(global.headers, options.headers);
   merged.params = mergeParams(global.params, options.params);
 
-  // set default options
+  // Set default options
   merged.method = merged.method?.toUpperCase() ?? 'GET';
   merged.responseType = merged.responseType ?? 'json';
   // The default value of `credentials` of some browsers is not `same-origin`
-  // e.g. Firefox 39-60 Chrome 42-67 Safari 10.1-11.1.2
+  // e.g. Firefox 39-60, Chrome 42-67, Safari 10.1-11.1.2
   merged.credentials = merged.credentials ?? 'same-origin';
   return merged;
 }
 
-const mergeHeaders = (val1: RequestOptions['headers'] = {}, val2: RequestOptions['headers'] = {}) => {
+type RequestHeaders = RequestOptions['headers'];
+type RequestParams = RequestOptions['params'];
+
+const mergeHeaders = (val1: RequestHeaders, val2: RequestHeaders) => {
   const source = new Headers(val1);
   const result = new Headers(val2);
   // For options, directly overwrite, and not append
@@ -27,7 +30,7 @@ const mergeHeaders = (val1: RequestOptions['headers'] = {}, val2: RequestOptions
   return result;
 };
 
-const mergeParams = (val1: RequestOptions['params'], val2: RequestOptions['params']) => {
+const mergeParams = (val1: RequestParams, val2: RequestParams) => {
   const source = new URLSearchParams(val1);
   const result = new URLSearchParams(val2);
   source.forEach((v, k) => result.set(k, v));

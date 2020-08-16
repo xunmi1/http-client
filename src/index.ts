@@ -21,7 +21,7 @@ class HttpClient {
 
   requset(url: string, options: RequestOptions) {
     const merged = mergeOptions(this.options, options)
-    const ctx = new Context({ url, ...merged });
+    const ctx = new Context(url, merged);
     return compose(this.middlewareStack)(ctx);
   }
 }
