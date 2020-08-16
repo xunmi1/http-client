@@ -1,18 +1,15 @@
 import compose from './compose';
 import Context from './Context';
-import { RequestOptions } from './interfaces';
+import { RequestOptions, Middleware } from './interfaces';
 import { isFunction, mergeOptions } from './utils';
 
-export type Next = () => Promise<any>;
-export type Middleware<T> = (context: Context, next: Next) => Promise<T>;
-
 class HttpClient {
-  private readonly middlewareStack: Middleware<any>[];
+  private readonly middlewareStack: Middleware<unknown>[];
   public readonly options: RequestOptions;
+  public data: any;
 
   constructor(options?: RequestOptions) {
     this.middlewareStack = [];
-    // The default value of `credentials` of some browsers is not `same-origin`
     this.options = mergeOptions(options);
   }
 
