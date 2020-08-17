@@ -4,12 +4,12 @@ export type ResponseType = 'json' | 'text' | 'blob' | 'arrayBuffer' | 'formData'
 
 export interface RequestOptions extends RequestInit {
   baseURL?: string;
-  responseType?: ResponseType
+  responseType?: ResponseType;
   data?: any;
   params?: ConstructorParameters<typeof URLSearchParams>[0];
   timeout?: number;
-  onDownloadProgress?: (event: { total: number, loaded: number }) => void;
+  onDownloadProgress?: (event: { total: number; loaded: number }) => void;
 }
 
 export type Next = () => Promise<void>;
-export type Middleware<T> = (context: Context, next: Next) => Promise<T>;
+export type Middleware<T> = (context: Context<any>, next: Next) => Promise<T>;

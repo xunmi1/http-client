@@ -1,5 +1,12 @@
 import { RequestOptions } from './interfaces';
 
+const toRawType = (val: unknown) => Object.prototype.toString.call(val).slice(8, -1);
+
+export const isPlainJSON = (val: unknown): val is Record<any, any> => {
+  const type = toRawType(val);
+  return ['Object', 'Array'].includes(type);
+};
+
 export const isObject = (val: unknown): val is Record<any, any> => val !== null && typeof val === 'object';
 export const isNumber = (val: unknown): val is number => typeof val === 'number';
 export const isString = (val: unknown): val is string => typeof val === 'string';
@@ -17,7 +24,7 @@ export const mergeOptions = (global: RequestOptions = {}, options: RequestOption
   // e.g. Firefox 39-60, Chrome 42-67, Safari 10.1-11.1.2
   merged.credentials = merged.credentials ?? 'same-origin';
   return merged;
-}
+};
 
 type RequestHeaders = RequestOptions['headers'];
 type RequestParams = RequestOptions['params'];

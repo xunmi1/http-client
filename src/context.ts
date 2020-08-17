@@ -7,13 +7,14 @@ interface ContextRequest extends RequestOptions {
   headers: Headers;
 }
 
-interface ContextResponse extends Response {
-  data?: any;
+interface ContextResponse<T> extends Response {
+  data?: T;
 }
 
-class Context {
+class Context<T> {
   public readonly request: ContextRequest;
-  public response?: ContextResponse;
+  public response?: ContextResponse<T>;
+  [key: string]: any;
 
   constructor(url: string, options: RequestOptions) {
     const params = new URLSearchParams(options.params);
@@ -33,8 +34,16 @@ class Context {
     return this.response?.status;
   }
 
+  get statusText() {
+    return this.response?.statusText;
+  }
+
   get headers() {
     return this.response?.headers;
+  }
+
+  get data() {
+    return this.response?.data;
   }
 }
 

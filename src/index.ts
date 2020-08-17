@@ -1,16 +1,19 @@
 import compose from './compose';
 import Context from './Context';
+import { fetchMiddleware, returnMiddleware } from './middleware';
 import { RequestOptions, Middleware } from './interfaces';
 import { isFunction, mergeOptions } from './utils';
 
 class HttpClient {
-  private readonly middlewareStack: Middleware<unknown>[];
+  private readonly middlewareStack: Middleware<any>[];
+  protected readonly coreMiddlewareStack: Middleware<any>[];
   public readonly options: RequestOptions;
   public data: any;
 
   constructor(options?: RequestOptions) {
     this.middlewareStack = [];
     this.options = mergeOptions(options);
+    this.coreMiddlewareStack = [returnMiddleware, fetchMiddleware];
   }
 
   use<T>(middleware: Middleware<T>) {
@@ -19,11 +22,14 @@ class HttpClient {
     return this;
   }
 
-  requset(url: string, options: RequestOptions) {
-    const merged = mergeOptions(this.options, options)
-    const ctx = new Context(url, merged);
-    return compose(this.middlewareStack)(ctx);
+  request<T>(url: string, options?: RequestOptions) {
+    const merged = mergeOptions(this.options, options);
+    const ctx = new Context<T>(url, merged);
+    const stack = [...this.middlewareStack, ...this.coreMiddlewareStack];
+    return compose(stack)(ctx);
   }
 }
 
 export default HttpClient;
+
+new HttpClient().request('xxx', { data: 2 });
