@@ -1,10 +1,8 @@
 import type Context from './Context';
 
-export type ResponseType = 'json' | 'text' | 'blob' | 'arrayBuffer' | 'formData';
-
 export interface RequestOptions extends RequestInit {
   baseURL?: string;
-  responseType?: ResponseType;
+  responseType?: 'json' | 'text' | 'blob' | 'arrayBuffer' | 'formData';
   data?: any;
   params?: ConstructorParameters<typeof URLSearchParams>[0];
   timeout?: number;

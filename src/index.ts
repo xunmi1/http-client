@@ -1,3 +1,4 @@
+import { version } from '../package.json';
 import compose from './compose';
 import Context from './Context';
 import { fetchMiddleware, returnMiddleware } from './middleware';
@@ -5,6 +6,7 @@ import { RequestOptions, Middleware } from './interfaces';
 import { isFunction, mergeOptions } from './utils';
 
 class HttpClient {
+  static readonly version = version;
   private readonly middlewareStack: Middleware<any>[];
   protected readonly coreMiddlewareStack: Middleware<any>[];
   public readonly options: RequestOptions;
@@ -31,5 +33,3 @@ class HttpClient {
 }
 
 export default HttpClient;
-
-new HttpClient().request('xxx', { data: 2 });

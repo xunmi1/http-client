@@ -4,8 +4,12 @@
   "description": "An HTTP client based on the Fetch API.",
   "main": "dist/index.js",
   "scripts": {
-    "build-ts": "tsc -p tsconfig.json",
-    "lint": "prettier --write --parser typescript \"**/*.ts\""
+    "build": "npm run lint && npm run build-ts && npm run build-rollup && npm run build-dts && rimraf .cache",
+    "build-ts": "rimraf .cache && tsc -p tsconfig.json --outDir .cache",
+    "build-rollup": "rimraf dist && rollup -c scripts/rollup.config.js  -i .cache/src/index.js",
+    "build-dts": "api-extractor run --local --typescript-compiler-folder \"node_modules/typescript\"",
+    "lint": "prettier --write --parser typescript \"**/*.ts\"",
+    "release": "npm test && npm run build && npm publish"
   },
   "repository": {
     "type": "git",
@@ -24,8 +28,14 @@
   },
   "homepage": "https://github.com/xunmi1/http-client#readme",
   "devDependencies": {
+    "@microsoft/api-extractor": "^7.9.5",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^9.0.0",
     "@xunmi/prettier-config": "^1.0.1",
     "prettier": "^2.0.5",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.26.3",
+    "rollup-plugin-terser": "^7.0.0",
     "typescript": "^3.9.7"
   },
   "prettier": "@xunmi/prettier-config"

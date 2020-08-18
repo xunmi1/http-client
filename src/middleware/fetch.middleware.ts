@@ -1,4 +1,4 @@
-import { Middleware, ResponseType } from '../interfaces';
+import { Middleware } from '../interfaces';
 import { isPlainJSON } from '../utils';
 import { HttpError } from '../error';
 
@@ -17,7 +17,7 @@ const transformParams = (url: string, baseURL?: string, params?: URLSearchParams
 };
 
 const types = ['json', 'text', 'blob', 'arrayBuffer', 'formData'];
-const parseResponse = (response: Response, responseType?: ResponseType) => {
+const parseResponse = (response: Response, responseType?: string) => {
   const type = responseType && types.includes(responseType) ? responseType : 'json';
   return response?.clone()[type]();
 };
