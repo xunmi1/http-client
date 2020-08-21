@@ -1,4 +1,4 @@
-import { Middleware } from '../interfaces';
+import { Next, Context } from '../interfaces';
 import { isPlainJSON } from '../utils';
 import { HttpError } from '../error';
 
@@ -22,7 +22,7 @@ const parseResponse = (response: Response, responseType?: string) => {
   return response?.clone()[type]();
 };
 
-const fetchMiddleware: Middleware<void> = async (ctx, next) => {
+const fetchMiddleware = async <T>(ctx: Context<T>, next: Next) => {
   const { baseURL, url, params, data, headers, responseType, ...options } = ctx.request;
   const { href } = transformParams(url, baseURL, params);
 

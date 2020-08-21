@@ -1,4 +1,5 @@
 import type Context from './Context';
+export type { Context };
 
 export interface RequestOptions extends RequestInit {
   baseURL?: string;
@@ -10,4 +11,4 @@ export interface RequestOptions extends RequestInit {
 }
 
 export type Next = () => Promise<void>;
-export type Middleware<T> = (context: Context<any>, next: Next) => Promise<T>;
+export type Middleware<T = any> = (context: Context<any>, next: Next) => Promise<T>;

@@ -7,8 +7,8 @@ import { isFunction, mergeOptions } from './utils';
 
 class HttpClient {
   static readonly version = version;
-  private readonly middlewareStack: Middleware<any>[];
-  protected readonly coreMiddlewareStack: Middleware<any>[];
+  private readonly middlewareStack: Middleware[];
+  protected readonly coreMiddlewareStack: Middleware[];
   public readonly options: RequestOptions;
   public data: any;
 
@@ -24,12 +24,14 @@ class HttpClient {
     return this;
   }
 
-  request<T>(url: string, options?: RequestOptions) {
+  request<T = any>(url: string, options?: RequestOptions) {
     const merged = mergeOptions(this.options, options);
     const ctx = new Context<T>(url, merged);
     const stack = [...this.middlewareStack, ...this.coreMiddlewareStack];
-    return compose(stack)(ctx);
+    return compose(stack)(ctx) as Promise<T>;
   }
 }
 
 export default HttpClient;
+
+new HttpClient().request('xxx').then(v => v.length);

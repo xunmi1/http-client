@@ -12,7 +12,7 @@ export const isNumber = (val: unknown): val is number => typeof val === 'number'
 export const isString = (val: unknown): val is string => typeof val === 'string';
 export const isFunction = (val: unknown): val is Function => typeof val === 'function';
 
-export const mergeOptions = (global: RequestOptions = {}, options: RequestOptions = {}) => {
+export const mergeOptions = (global: RequestOptions = {}, options: RequestOptions = {}): RequestOptions => {
   const merged = { ...global, ...options };
   merged.headers = mergeHeaders(global.headers, options.headers);
   merged.params = mergeParams(global.params, options.params);

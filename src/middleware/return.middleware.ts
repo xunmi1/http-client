@@ -1,5 +1,4 @@
-import { Next } from '../interfaces';
-import type Context from '../context';
+import { Next, Context } from '../interfaces';
 
 const returnMiddleware = <T>(ctx: Context<T>, next: Next) => {
   return next().then(() => ({
