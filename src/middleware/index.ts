@@ -1,2 +1,4 @@
-export { default as fetchMiddleware } from './fetch.middleware';
-export { default as returnMiddleware } from './return.middleware';
+export * from './fetch.middleware';
+export * from './parse.fetch.mddleware';
+export * from './return.middleware';
+export * from './download.middleware';

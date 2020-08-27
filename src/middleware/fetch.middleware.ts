@@ -16,37 +16,26 @@ const transformParams = (url: string, baseURL?: string, params?: URLSearchParams
   return result;
 };
 
-const types = ['json', 'text', 'blob', 'arrayBuffer', 'formData'];
-const parseResponse = (response: Response, responseType?: string) => {
-  const type = responseType && types.includes(responseType) ? responseType : 'json';
-  return response?.clone()[type]();
-};
-
-const fetchMiddleware = async <T>(ctx: Context<T>, next: Next) => {
-  const { baseURL, url, params, data, headers, responseType, ...options } = ctx.request;
+export const fetchMiddleware = <T>(ctx: Context<T>, next: Next) => {
+  const { baseURL, url, params, data, responseType, onDownloadProgress, timeout, ...options } = ctx.request;
   const { href } = transformParams(url, baseURL, params);
 
   // default common headers
-  setHeaderIfUnset(headers, 'Accept', 'application/json, text/plain, */*');
+  setHeaderIfUnset(options.headers, 'Accept', 'application/json, text/plain, */*');
 
   if (options.body == null && data != null && !methodsNoBody.includes(options.method ?? 'GET')) {
     if (isPlainJSON(data)) {
-      setHeaderIfUnset(headers, 'Content-Type', 'application/json;charset=UTF-8');
+      setHeaderIfUnset(options.headers, 'Content-Type', 'application/json;charset=UTF-8');
       options.body = JSON.stringify(data);
     }
     options.body = data;
   }
-
-  const response = await fetch(href, options);
-  ctx.response = response;
-  ctx.response.data = await parseResponse(response, responseType);
-
-  // ok: status in the range 200 ~ 299
-  if (!response.ok) {
-    throw new HttpError(`Request failed with status code ${response.status}`, response);
-  }
-
-  return next();
+  return fetch(href, options)
+    .then(response => {
+      ctx.response = response;
+      if (!response.ok) {
+        throw new HttpError(`Request failed with status code ${response.status}`, response);
+      }
+    })
+    .finally(next);
 };
-
-export default fetchMiddleware;

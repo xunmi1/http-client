@@ -28,13 +28,13 @@
   },
   "homepage": "https://github.com/xunmi1/http-client#readme",
   "devDependencies": {
-    "@microsoft/api-extractor": "^7.9.8",
+    "@microsoft/api-extractor": "^7.9.10",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^9.0.0",
     "@xunmi/prettier-config": "^1.0.1",
-    "prettier": "^2.0.5",
+    "prettier": "^2.1.1",
     "rimraf": "^3.0.2",
-    "rollup": "^2.26.4",
+    "rollup": "^2.26.5",
     "rollup-plugin-terser": "^7.0.0",
     "typescript": "^4.0.2"
   },

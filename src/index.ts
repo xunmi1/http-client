@@ -1,7 +1,7 @@
 import { version } from '../package.json';
 import compose from './compose';
 import Context from './Context';
-import { fetchMiddleware, returnMiddleware } from './middleware';
+import { fetchMiddleware, returnMiddleware, downloadMiddleware, parseFetchMiddleware } from './middleware';
 import { RequestOptions, Middleware } from './interfaces';
 import { isFunction, mergeOptions } from './utils';
 
@@ -15,7 +15,7 @@ class HttpClient {
   constructor(options?: RequestOptions) {
     this.middlewareStack = [];
     this.options = mergeOptions(options);
-    this.coreMiddlewareStack = [returnMiddleware, fetchMiddleware];
+    this.coreMiddlewareStack = [returnMiddleware, parseFetchMiddleware, downloadMiddleware, fetchMiddleware];
   }
 
   use<T>(middleware: Middleware<T>) {
@@ -33,5 +33,3 @@ class HttpClient {
 }
 
 export default HttpClient;
-
-new HttpClient().request('xxx').then(v => v.length);
