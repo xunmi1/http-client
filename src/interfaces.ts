@@ -1,12 +1,12 @@
 import type Context from './Context';
 export type { Context };
 
-export type DownloadResult = {
+export interface DownloadResult<T = Uint8Array> {
   total: number;
   loaded: number;
   done: boolean;
-  value?: Uint8Array;
-};
+  value?: T;
+}
 
 export interface RequestOptions extends RequestInit {
   baseURL?: string;

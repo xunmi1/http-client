@@ -2,7 +2,8 @@ import { Next, Context } from '../interfaces';
 import { isPlainJSON } from '../utils';
 import { HttpError } from '../error';
 
-const methodsNoBody = ['GET', 'HEAD'];
+const METHODS_NO_BODY = ['GET', 'HEAD'];
+const canHaveBody = (method?: string) => !!method && !METHODS_NO_BODY.includes(method);
 
 const setHeaderIfUnset = (headers: Headers, name: string, value: string) => {
   if (!headers.has(name)) headers.append(name, value);
@@ -23,7 +24,7 @@ export const fetchMiddleware = <T>(ctx: Context<T>, next: Next) => {
   // default common headers
   setHeaderIfUnset(options.headers, 'Accept', 'application/json, text/plain, */*');
 
-  if (options.body == null && data != null && !methodsNoBody.includes(options.method ?? 'GET')) {
+  if (options.body == null && data != null && canHaveBody(options.method)) {
     if (isPlainJSON(data)) {
       setHeaderIfUnset(options.headers, 'Content-Type', 'application/json;charset=UTF-8');
       options.body = JSON.stringify(data);
