@@ -11,7 +11,7 @@ export interface ContextResponse<T> extends Response {
   data?: T;
 }
 
-class Context<T> {
+class Context<T = any> {
   public readonly request: ContextRequest;
   public response?: ContextResponse<T>;
   [key: string]: any;

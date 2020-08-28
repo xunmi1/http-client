@@ -1,9 +1,19 @@
 import { Next, Context } from '../interfaces';
-
-const TYPES = ['json', 'text', 'blob', 'arrayBuffer', 'formData'];
+import { Exception } from '../exception';
 
 export const parseFetchMiddleware = <T>(ctx: Context<T>, next: Next) => {
-  const type = ctx.request.responseType;
-  const handler = type && TYPES.includes(type) ? type : 'json';
-  return next().then(() => ctx.response?.clone()[handler]());
+  const type = ctx.request.responseType ?? 'json';
+
+  return next().then(() => {
+    const response = ctx.response;
+    if (!response || response.bodyUsed) return response?.body;
+
+    return response
+      .clone()
+      [type]()
+      .catch(() => {
+        const message = `The responseType of \`${type}\` is not supported`;
+        throw new Exception(message, Exception.Names.PARSE_ERROR, ctx);
+      });
+  });
 };

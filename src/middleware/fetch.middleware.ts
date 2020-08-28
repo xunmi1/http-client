@@ -1,6 +1,6 @@
 import { Next, Context } from '../interfaces';
+import { Exception } from '../exception';
 import { isPlainJSON } from '../utils';
-import { HttpError } from '../error';
 
 const METHODS_NO_BODY = ['GET', 'HEAD'];
 const canHaveBody = (method?: string) => !!method && !METHODS_NO_BODY.includes(method);
@@ -35,7 +35,7 @@ export const fetchMiddleware = <T>(ctx: Context<T>, next: Next) => {
     .then(response => {
       ctx.response = response;
       if (!response.ok) {
-        throw new HttpError(`Request failed with status code ${ctx.status}`, ctx);
+        throw new Exception(`Request failed with status code ${ctx.status}`, Exception.Names.HTTP_ERROR, ctx);
       }
     })
     .finally(next);
