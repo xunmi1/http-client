@@ -1,9 +1,21 @@
-export class HttpError extends Error {
-  public readonly response: Response;
+import type Context from "./context";
 
-  constructor(message: string, response: Response) {
-    super(message ?? response.statusText);
+export class HttpError<T> extends Error {
+  public readonly context;
+
+  constructor(message: string, context: Context<T>) {
+    super(message ?? context.statusText);
     this.name = this.constructor.name;
-    this.response = response;
+    this.context = context;
+  }
+}
+
+export class TimeoutError<T> extends Error {
+  public readonly context;
+
+  constructor(message: string, context: Context<T>) {
+    super(message);
+    this.name = this.constructor.name;
+    this.context = context;
   }
 }

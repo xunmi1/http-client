@@ -3,7 +3,6 @@ type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
 
 type Next = () => Promise<any>;
 type Middleware<T> = (context: any, next: Next) => Promise<T>;
-
 type Composed<T extends any[]> = (context: unknown, next?: Next) => UnionToIntersection<ReturnType<TupleToUnion<T>>>;
 
 const error = new Error('next() should not be called multiple times in one middleware');

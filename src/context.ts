@@ -1,13 +1,13 @@
 import { RequestOptions } from './interfaces';
 
 // Since the properties of `Request` are read-only, use `RequestOptions`
-interface ContextRequest extends RequestOptions {
+export interface ContextRequest extends RequestOptions {
   url: string;
   params: URLSearchParams;
   headers: Headers;
 }
 
-interface ContextResponse<T> extends Response {
+export interface ContextResponse<T> extends Response {
   data?: T;
 }
 

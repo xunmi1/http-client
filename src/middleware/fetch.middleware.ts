@@ -35,7 +35,7 @@ export const fetchMiddleware = <T>(ctx: Context<T>, next: Next) => {
     .then(response => {
       ctx.response = response;
       if (!response.ok) {
-        throw new HttpError(`Request failed with status code ${response.status}`, response);
+        throw new HttpError(`Request failed with status code ${ctx.status}`, ctx);
       }
     })
     .finally(next);

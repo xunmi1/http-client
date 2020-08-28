@@ -19,10 +19,10 @@ export const mergeOptions = (global: RequestOptions = {}, options: RequestOption
 
   // Set default options
   merged.method = merged.method?.toUpperCase() ?? 'GET';
-  merged.responseType = merged.responseType ?? 'json';
+  merged.responseType ??= 'json';
   // The default value of `credentials` of some browsers is not `same-origin`
   // e.g. Firefox 39-60, Chrome 42-67, Safari 10.1-11.1.2
-  merged.credentials = merged.credentials ?? 'same-origin';
+  merged.credentials ??= 'same-origin';
   return merged;
 };
 

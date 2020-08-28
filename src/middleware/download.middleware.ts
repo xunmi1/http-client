@@ -3,9 +3,13 @@ import { isFunction } from '../utils';
 
 const CONTENT_LENGTH = 'content-length';
 
+/**
+ * Implement `onDownloadProgress` feature
+ */
 export const downloadMiddleware = <T>(ctx: Context<T>, next: Next) => {
   const notice = ctx.request.onDownloadProgress;
   if (!isFunction(notice)) return next();
+
   const noticeSync = (params: DownloadResult) => Promise.resolve().then(() => notice(params));
 
   return next().then(() => {
@@ -15,12 +19,12 @@ export const downloadMiddleware = <T>(ctx: Context<T>, next: Next) => {
 
     let loaded = 0;
     const reader = readableStream.getReader();
-    const read = () =>
+    const read = (): Promise<undefined> =>
       reader.read().then(({ value, done }) => {
         loaded += value?.length ?? 0;
         // Avoid blocking the current queue
         noticeSync({ total, loaded, value, done });
-        if (!done) read();
+        if (!done) return read();
       });
 
     return read();
