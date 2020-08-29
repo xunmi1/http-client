@@ -26,8 +26,8 @@ export const timeoutMiddleware = <T>(ctx: Context<T>, next: Next) => {
   if (!isNumber(timeout)) return next();
 
   if (!isWithinRange(timeout, 0, MAX_SAFE_TIMEOUT)) {
-    const message = `The timeout of ${timeout}ms not to be within range ${0} - ${MAX_SAFE_TIMEOUT}ms`;
-    throw new Exception(message, Exception.Names.TIMEOUT_ERROR, ctx);
+    const message = `The timeout of ${timeout}ms not to be within range ${0} - ${MAX_SAFE_TIMEOUT}ms.`;
+    throw new Exception(message, Exception.Types.TYPE_ERROR, ctx);
   }
 
   const controller = new AbortController();
@@ -35,7 +35,7 @@ export const timeoutMiddleware = <T>(ctx: Context<T>, next: Next) => {
 
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
-      reject(new Exception(`The timeout of ${timeout}ms exceeded`, Exception.Names.TIMEOUT_ERROR, ctx));
+      reject(new Exception(`The timeout of ${timeout}ms exceeded.`, Exception.Types.TIMEOUT_ERROR, ctx));
       controller.abort();
     }, timeout);
 

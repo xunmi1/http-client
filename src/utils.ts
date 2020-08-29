@@ -43,3 +43,6 @@ const mergeParams = (val1: RequestParams, val2: RequestParams) => {
   source.forEach((v, k) => result.set(k, v));
   return result;
 };
+
+const ABORT_ERROR_NAME = 'AbortError';
+export const isAborted = (val: unknown): val is DOMException => val instanceof DOMException && val.name === ABORT_ERROR_NAME;

@@ -1,5 +1,4 @@
 import { Next, Context } from '../interfaces';
-import { Exception } from '../exception';
 import { isPlainJSON } from '../utils';
 
 const METHODS_NO_BODY = ['GET', 'HEAD'];
@@ -31,12 +30,10 @@ export const fetchMiddleware = <T>(ctx: Context<T>, next: Next) => {
     }
     options.body = data;
   }
+
   return fetch(href, options)
     .then(response => {
       ctx.response = response;
-      if (!response.ok) {
-        throw new Exception(`Request failed with status code ${ctx.status}`, Exception.Names.HTTP_ERROR, ctx);
-      }
     })
     .finally(next);
 };

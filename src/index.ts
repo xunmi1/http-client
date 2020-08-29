@@ -3,10 +3,11 @@ import compose from './compose';
 import Context from './Context';
 import {
   fetchMiddleware,
-  returnMiddleware,
   downloadMiddleware,
   parseFetchMiddleware,
   timeoutMiddleware,
+  returnMiddleware,
+  exceptionMiddleware,
 } from './middleware';
 import { RequestOptions, Middleware } from './interfaces';
 import { isFunction, mergeOptions } from './utils';
@@ -22,6 +23,7 @@ class HttpClient {
     this.middlewareStack = [];
     this.options = mergeOptions(options);
     this.coreMiddlewareStack = [
+      exceptionMiddleware,
       returnMiddleware,
       timeoutMiddleware,
       parseFetchMiddleware,
@@ -40,7 +42,7 @@ class HttpClient {
     const merged = mergeOptions(this.options, options);
     const ctx = new Context<T>(url, merged);
     const stack = [...this.middlewareStack, ...this.coreMiddlewareStack];
-    return compose(stack)(ctx) as Promise<T>;
+    return compose(stack)(ctx);
   }
 }
 
