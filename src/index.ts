@@ -14,10 +14,9 @@ import { isFunction, mergeOptions } from './utils';
 
 class HttpClient {
   static readonly version = version;
-  private readonly middlewareStack: Middleware[];
+  protected readonly middlewareStack: Middleware[];
   protected readonly coreMiddlewareStack: Middleware[];
   public readonly options: RequestOptions;
-  public data: any;
 
   constructor(options?: RequestOptions) {
     this.middlewareStack = [];

@@ -1,6 +1,10 @@
 import type Context from './Context';
 export type { Context };
 
+type PickPromiseKeys<T> = {
+  [P in keyof T]: T[P] extends () => Promise<any> ? P : never;
+}[keyof T];
+
 export interface DownloadResult<T = Uint8Array> {
   total: number;
   loaded: number;
@@ -10,12 +14,12 @@ export interface DownloadResult<T = Uint8Array> {
 
 export interface RequestOptions extends RequestInit {
   baseURL?: string;
-  responseType?: 'json' | 'text' | 'blob' | 'arrayBuffer' | 'formData';
+  responseType?: PickPromiseKeys<Body>;
   data?: any;
   params?: ConstructorParameters<typeof URLSearchParams>[0];
-  timeout?: number;
+  timeout?: number | false;
   onDownloadProgress?: (result: DownloadResult) => void;
 }
 
 export type Next = () => Promise<void>;
-export type Middleware<T = any> = (context: Context<any>, next: Next) => Promise<T>;
+export type Middleware<T = any, R = any> = (context: Context<R>, next: Next) => Promise<T>;

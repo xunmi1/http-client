@@ -6,7 +6,7 @@ enum ExceptionTypes {
   ABORT_ERROR = 'AbortError',
   TIMEOUT_ERROR = 'TimeoutError',
   PARSE_ERROR = 'ParseError',
-  UNKNOWN_ERROR = 'UnknownError'
+  UNKNOWN_ERROR = 'UnknownError',
 }
 
 export class Exception<T> extends Error {

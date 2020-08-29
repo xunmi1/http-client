@@ -34,8 +34,8 @@
     "@xunmi/prettier-config": "^1.0.1",
     "prettier": "^2.1.1",
     "rimraf": "^3.0.2",
-    "rollup": "^2.26.6",
-    "rollup-plugin-terser": "^7.0.0",
+    "rollup": "^2.26.8",
+    "rollup-plugin-terser": "^7.0.1",
     "typescript": "^4.0.2"
   },
   "prettier": "@xunmi/prettier-config"
