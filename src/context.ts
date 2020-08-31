@@ -1,6 +1,6 @@
 import { RequestOptions } from './interfaces';
 
-// Since the properties of `Request` are read-only, use `RequestOptions`
+// Since some properties of `Request` are read-only, use `RequestOptions`
 export interface ContextRequest extends RequestOptions {
   url: string;
   params: URLSearchParams;
@@ -11,7 +11,7 @@ export interface ContextResponse<T> extends Response {
   data?: T;
 }
 
-class Context<T = any> {
+export class Context<T = any> {
   public readonly request: ContextRequest;
   public response?: ContextResponse<T>;
   [key: string]: any;
@@ -46,5 +46,3 @@ class Context<T = any> {
     return this.response?.data;
   }
 }
-
-export default Context;

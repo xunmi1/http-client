@@ -1,4 +1,4 @@
-import type Context from './Context';
+import type { Context } from './context';
 export type { Context };
 
 type PickPromiseKeys<T> = {

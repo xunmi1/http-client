@@ -1,6 +1,6 @@
-import Context from './context';
+import { Context } from './interfaces';
 
-enum ExceptionTypes {
+export enum ExceptionTypes {
   HTTP_ERROR = 'HttpError',
   TYPE_ERROR = 'TypeError',
   ABORT_ERROR = 'AbortError',
