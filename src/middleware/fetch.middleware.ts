@@ -10,21 +10,22 @@ const transformParams = (url: string, baseURL?: string, params?: URLSearchParams
 };
 
 export const fetchMiddleware = <T>(ctx: Context<T>, next: Next) => {
-  const { baseURL, url, params, data, responseType, onDownloadProgress, timeout, ...options } = ctx.request;
+  const request = ctx.request;
+  const { baseURL, url, params, data, headers } = request;
   const { href } = transformParams(url, baseURL, params);
 
   // default common headers
-  setIfNull(options.headers, 'Accept', 'application/json, text/plain, */*');
+  setIfNull(headers, 'Accept', 'application/json, text/plain, */*');
 
-  if (options.body == null && data != null) {
+  if (request.body == null && data != null) {
     if (isPlainJSON(data)) {
-      setIfNull(options.headers, 'Content-Type', 'application/json;charset=UTF-8');
-      options.body = JSON.stringify(data);
+      setIfNull(headers, 'Content-Type', 'application/json;charset=UTF-8');
+      request.body = JSON.stringify(data);
     }
-    options.body = data;
+    request.body = data;
   }
 
-  return fetch(href, options)
+  return fetch(href, request)
     .then(response => {
       ctx.response = response;
     })

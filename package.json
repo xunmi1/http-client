@@ -2,7 +2,8 @@
   "name": "@xunmi/http-client",
   "version": "0.1.0",
   "description": "An HTTP client based on the Fetch API.",
-  "main": "dist/index.js",
+  "main": "dist/http-client.umd.js",
+  "module": "dist/http-client.esm.js",
   "scripts": {
     "build": "npm run build-ts && npm run build-rollup && npm run build-dts && rimraf .cache",
     "build-ts": "rimraf .cache && tsc -p tsconfig.json --outDir .cache",

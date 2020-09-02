@@ -19,10 +19,10 @@ const outputFileList = [
   { format: 'esm', min: true },
 ];
 
-const output = outputFileList.map(({ name, format, min }) => {
+const output = outputFileList.map(({ name, format, min, ...options }) => {
   const file = `dist/http-client.${format}${min ? '.min' : ''}.js`;
   const plugins = min ? [terser()] : [];
-  return { name, format, banner, file, sourcemap: false, plugins };
+  return { name, format, banner, file, sourcemap: false, plugins, ...options };
 });
 
 export default {

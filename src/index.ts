@@ -26,8 +26,17 @@ const coreMiddlewareStack = [
   fetchMiddleware,
 ];
 
+const initOptions: RequestOptions = {
+  method: 'GET',
+  responseType: 'json',
+  // The default value of `credentials` of some browsers is not `same-origin`,
+  // e.g. Firefox 39-60, Chrome 42-67, Safari 10.1-11.1.2
+  credentials: 'same-origin',
+};
+
 class HttpClient {
   static readonly version = version;
+  static readonly compose = compose;
   static readonly Exception = Exception;
   protected static readonly coreMiddlewareStack = coreMiddlewareStack;
 
@@ -44,7 +53,8 @@ class HttpClient {
 
   constructor(options?: RequestOptions) {
     this.middlewareStack = [];
-    this.defaults = mergeOptions(options);
+    this.defaults = mergeOptions(initOptions, options);
+
     const methods = ['get', 'post', 'delete', 'put', 'patch', 'head', 'options'];
     methods.forEach(method => {
       this[method] = (url: string, options?: RequestOptions) => this.request(url, { ...options, method });
