@@ -43,3 +43,7 @@ const mergeParams = (val1: RequestParams, val2: RequestParams) => {
 const ABORT_ERROR_NAME = 'AbortError';
 export const isAborted = (val: unknown): val is DOMException =>
   val instanceof DOMException && val.name === ABORT_ERROR_NAME;
+
+export const promisify = <T extends (...args: any[]) => any>(fn: T) => (
+  ...args: Parameters<T>
+): Promise<ReturnType<T>> => Promise.resolve().then(() => fn(...args));

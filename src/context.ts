@@ -14,7 +14,6 @@ export interface ContextResponse<T> extends Response {
 export class Context<T = any> {
   public readonly request: ContextRequest;
   public response?: ContextResponse<T>;
-  [key: string]: any;
 
   constructor(url: string, options: RequestOptions) {
     const params = new URLSearchParams(options.params);

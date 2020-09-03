@@ -1,5 +1,5 @@
-import { Next, Context, DownloadResult } from '../interfaces';
-import { isFunction } from '../utils';
+import { Next, Context } from '../interfaces';
+import { isFunction, promisify } from '../utils';
 
 const CONTENT_LENGTH = 'content-length';
 
@@ -8,9 +8,9 @@ const CONTENT_LENGTH = 'content-length';
  */
 export const downloadMiddleware = <T>(ctx: Context<T>, next: Next) => {
   const notice = ctx.request.onDownloadProgress;
-  if (!isFunction(notice)) return next();
+  if (!notice || !isFunction(notice)) return next();
 
-  const noticeSync = (params: DownloadResult) => Promise.resolve().then(() => notice(params));
+  const noticeAsync = promisify(notice);
 
   return next().then(() => {
     const total = Number(ctx.headers?.get(CONTENT_LENGTH)) ?? 0;
@@ -23,7 +23,7 @@ export const downloadMiddleware = <T>(ctx: Context<T>, next: Next) => {
       reader.read().then(({ value, done }) => {
         loaded += value?.length ?? 0;
         // Avoid blocking the current queue
-        noticeSync({ total, loaded, value, done });
+        noticeAsync({ total, loaded, value, done });
         if (!done) return read();
       });
 

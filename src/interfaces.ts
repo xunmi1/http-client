@@ -1,24 +1,24 @@
+export type { Exception, ExceptionTypes } from './exception';
+export type { Context, ContextRequest, ContextResponse } from './context';
 import type { Context } from './context';
-export type { Context };
 
-type PickPromiseKeys<T> = {
-  [P in keyof T]: T[P] extends () => Promise<any> ? P : never;
+export type PickKeys<T, R> = {
+  [P in keyof T]: T[P] extends R ? P : never;
 }[keyof T];
 
-export interface DownloadResult<T = Uint8Array> {
-  total: number;
-  loaded: number;
-  done: boolean;
-  value?: T;
+export type ResponseType = PickKeys<Body, () => Promise<any>>;
+
+export interface DownloadProgressEvent<T = Uint8Array> {
+  (event: { total: number; loaded: number; done: boolean; value?: T }): void;
 }
 
 export interface RequestOptions extends RequestInit {
   baseURL?: string;
-  responseType?: PickPromiseKeys<Body>;
+  responseType?: ResponseType;
   data?: any;
   params?: ConstructorParameters<typeof URLSearchParams>[0];
   timeout?: number | false;
-  onDownloadProgress?: (result: DownloadResult) => void;
+  onDownloadProgress?: DownloadProgressEvent;
 }
 
 export type Next = () => Promise<void>;
