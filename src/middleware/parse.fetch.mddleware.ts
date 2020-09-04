@@ -7,7 +7,7 @@ const parse = <T>(response: Response, type: ResponseType): Promise<T> => {
     // response data may be an empty string
     return cloned.text().then(data => data && JSON.parse(data));
   }
-  return cloned[type]() as unknown as Promise<T>;
+  return (cloned[type]() as unknown) as Promise<T>;
 };
 
 export const parseFetchMiddleware = <T>(ctx: Context<T>, next: Next) => {
