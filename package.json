@@ -4,11 +4,16 @@
   "description": "An HTTP client based on the Fetch API.",
   "main": "dist/http-client.umd.js",
   "module": "dist/http-client.esm.js",
+  "types": "dist/http-client.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "npm run build-ts && npm run build-rollup && npm run build-dts && rimraf .cache",
     "build-ts": "rimraf .cache && tsc -p tsconfig.json --outDir .cache",
     "build-rollup": "rimraf dist && rollup -c scripts/rollup.config.js  -i .cache/src/index.js",
     "build-dts": "api-extractor run --local --typescript-compiler-folder \"node_modules/typescript\"",
+    "test": "rimraf coverage && jest --runInBand --logHeapUsage",
     "lint": "prettier --write --parser typescript \"**/*.ts\"",
     "release": "npm test && npm run build && npm publish"
   },
@@ -32,11 +37,16 @@
     "@microsoft/api-extractor": "^7.9.11",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^9.0.0",
+    "@types/jest": "^26.0.13",
     "@xunmi/prettier-config": "^1.0.1",
+    "isomorphic-fetch": "^2.2.1",
+    "jest": "^26.4.2",
+    "nock": "^13.0.4",
     "prettier": "^2.1.1",
     "rimraf": "^3.0.2",
     "rollup": "^2.26.8",
     "rollup-plugin-terser": "^7.0.1",
+    "ts-jest": "^26.3.0",
     "typescript": "^4.0.2"
   },
   "prettier": "@xunmi/prettier-config"
