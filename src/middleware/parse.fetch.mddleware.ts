@@ -1,5 +1,14 @@
-import { Next, Context } from '../interfaces';
+import { Next, Context, ResponseType } from '../interfaces';
 import { Exception } from '../exception';
+
+const parse = <T>(response: Response, type: ResponseType): Promise<T> => {
+  const cloned = response.clone();
+  if (type === 'json') {
+    // response data may be an empty string
+    return cloned.text().then(data => data && JSON.parse(data));
+  }
+  return cloned[type]() as unknown as Promise<T>;
+};
 
 export const parseFetchMiddleware = <T>(ctx: Context<T>, next: Next) => {
   const type = ctx.request.responseType ?? 'json';
@@ -13,10 +22,8 @@ export const parseFetchMiddleware = <T>(ctx: Context<T>, next: Next) => {
         throw new Exception(message, Exception.Types.HTTP_ERROR, ctx);
       }
 
-      return response
-        .clone()
-        [type]()
-        .then((data: T) => {
+      return parse<T>(response, type)
+        .then(data => {
           response.data = data;
         })
         .catch(error => {
