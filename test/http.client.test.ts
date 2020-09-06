@@ -1,5 +1,4 @@
 import HttpClient from '../src';
-import { Context } from '../src/context';
 import nock from 'nock';
 
 test('create instance', async () => {
@@ -73,17 +72,22 @@ describe('middleware', () => {
   test('middleware must be a function', () => {
     // @ts-ignore
     expect(() => new HttpClient().use('')).toThrow(TypeError);
+    // @ts-ignore
+    expect(() => HttpClient.use('')).toThrow(TypeError);
   });
 
   test('use middleware', async () => {
-    const [baseURL, url] = ['https://api.myservice.com/', '/middleware'];
-    nock(baseURL).get(url).reply(200);
+    const [baseURL, url] = ['https://api.myservice.com/', '/middleware/instance'];
+    nock(baseURL).get(url).times(2).reply(200);
 
-    const http = new HttpClient({ baseURL });
     const mockMiddleware = jest.fn((ctx: any, next: any) => next());
-    await http.use(mockMiddleware).get(url);
+
+    const http1 = new HttpClient({ baseURL }).use(mockMiddleware);
+    const http2 = new HttpClient({ baseURL });
+    await http1.get(url);
+    await http2.get(url);
 
     expect(mockMiddleware.mock.calls.length).toBe(1);
-    expect(mockMiddleware).toBeCalledWith(expect.any(Context), expect.any(Function));
+    expect(mockMiddleware).toBeCalledWith(expect.any(HttpClient.Context), expect.any(Function));
   });
 });
