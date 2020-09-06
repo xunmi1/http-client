@@ -1,8 +1,6 @@
-export type { Exception, ExceptionTypes } from './exception';
-export type { Context, ContextRequest, ContextResponse } from './context';
 import type { Context } from './context';
 
-export type PickKeys<T, R> = {
+type PickKeys<T, R> = {
   [P in keyof T]: T[P] extends R ? P : never;
 }[keyof T];
 
@@ -21,5 +19,12 @@ export interface RequestOptions extends RequestInit {
   onDownloadProgress?: DownloadProgressEvent;
 }
 
-export type Next = () => Promise<void>;
-export type Middleware<T = any, R = any> = (context: Context<R>, next: Next) => Promise<T>;
+export { Context };
+
+export interface Next {
+  (): Promise<any>;
+}
+
+export interface Middleware<C = Context> {
+  (context: C, next: Next): Promise<any>;
+}

@@ -1,5 +1,5 @@
 import { version } from '../package.json';
-import compose from './compose';
+import { Model } from './model';
 import { Context } from './context';
 import { Exception } from './exception';
 import {
@@ -10,36 +10,37 @@ import {
   returnMiddleware,
   exceptionMiddleware,
 } from './middleware';
-import { RequestOptions, Middleware } from './interfaces';
-import { isFunction, mergeOptions } from './utils';
+import { RequestOptions } from './interfaces';
+import { mergeOptions } from './utils';
 
 export type RequestMethod = HttpClient['request'];
 
-const coreMiddlewareStack = [
+const coreMiddleware = Model.compose([
   exceptionMiddleware,
   returnMiddleware,
   parseFetchMiddleware,
   timeoutMiddleware,
   downloadMiddleware,
   fetchMiddleware,
-];
+]);
 
 const initOptions: RequestOptions = {
   method: 'GET',
   responseType: 'json',
-  // The default value of `credentials` of some browsers is not `same-origin`,
+  // The default value of `credentials` of some old browsers is not `same-origin`,
   // e.g. Firefox 39-60, Chrome 42-67, Safari 10.1-11.1.2
   credentials: 'same-origin',
 };
 
-export class HttpClient {
+export class HttpClient extends Model<Context> {
   static readonly version = version;
-  static readonly compose = compose;
+  static readonly Model = Model;
   static readonly Exception = Exception;
-  protected static readonly coreMiddlewareStack: Middleware[] = coreMiddlewareStack;
+  static readonly Context = Context;
+  static readonly mergeOptions = mergeOptions;
 
-  protected readonly middlewareStack: Middleware[];
   protected readonly defaults: RequestOptions;
+  protected readonly coreMiddleware = coreMiddleware;
 
   get: RequestMethod;
   post: RequestMethod;
@@ -50,8 +51,8 @@ export class HttpClient {
   options: RequestMethod;
 
   constructor(options?: RequestOptions) {
-    this.middlewareStack = [];
-    this.defaults = mergeOptions(initOptions, options);
+    super();
+    this.defaults = HttpClient.mergeOptions(initOptions, options);
 
     const methods = ['get', 'post', 'delete', 'put', 'patch', 'head', 'options'];
     methods.forEach(method => {
@@ -59,16 +60,9 @@ export class HttpClient {
     });
   }
 
-  use(middleware: Middleware) {
-    if (!isFunction(middleware)) throw new TypeError('middleware must be a function!');
-    this.middlewareStack.push(middleware);
-    return this;
-  }
-
   request(url: string, options?: RequestOptions): Promise<any> {
-    const merged = mergeOptions(this.defaults, options);
-    const ctx = new Context(url, merged);
-    const stack = [...this.middlewareStack, ...HttpClient.coreMiddlewareStack];
-    return compose(stack)(ctx);
+    const merged = HttpClient.mergeOptions(this.defaults, options);
+    const ctx = new HttpClient.Context(url, merged);
+    return this.compose()(ctx);
   }
 }
