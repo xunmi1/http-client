@@ -6,6 +6,9 @@ type PickKeys<T, R> = {
 
 export type ResponseType = PickKeys<Body, () => Promise<any>>;
 
+export type RequestParams = any[][] | Record<string | number, any> | string | URLSearchParams;
+export type RequestData = Record<string | number, any> | any[] | BodyInit;
+
 export interface DownloadProgressEvent<T = Uint8Array> {
   (event: { total: number; loaded: number; done: boolean; value?: T }): void;
 }
@@ -13,10 +16,12 @@ export interface DownloadProgressEvent<T = Uint8Array> {
 export interface RequestOptions extends RequestInit {
   baseURL?: string;
   responseType?: ResponseType;
-  data?: any;
-  params?: ConstructorParameters<typeof URLSearchParams>[0];
+  data?: RequestData;
+  params?: RequestParams;
   timeout?: number | false;
   onDownloadProgress?: DownloadProgressEvent;
+  // Convenient for users to expand the configuration
+  [key: string]: any;
 }
 
 export { Context };

@@ -9,7 +9,7 @@ export enum ExceptionTypes {
   UNKNOWN_ERROR = 'UnknownError',
 }
 
-export class Exception<T> extends Error {
+export class Exception<T = any> extends Error {
   public static readonly Types = ExceptionTypes;
   public readonly context;
   public readonly type;

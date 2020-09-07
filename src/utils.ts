@@ -2,7 +2,7 @@ import { RequestOptions } from './interfaces';
 
 const toRawType = (val: unknown) => Object.prototype.toString.call(val).slice(8, -1);
 
-export const isPlainJSON = (val: unknown): val is Record<any, any> | any[] => {
+export const isPlainJSON = (val: unknown): val is Record<string | number, any> | any[] => {
   const type = toRawType(val);
   return ['Object', 'Array'].includes(type);
 };
@@ -34,8 +34,8 @@ const mergeHeaders = (val1: RequestHeaders, val2: RequestHeaders) => {
 };
 
 const mergeParams = (val1: RequestParams, val2: RequestParams) => {
-  const source = new URLSearchParams(val1);
-  const result = new URLSearchParams(val2);
+  const source = new URLSearchParams(val1 as any);
+  const result = new URLSearchParams(val2 as any);
   source.forEach((v, k) => setIfNull(result, k, v));
   return result;
 };
