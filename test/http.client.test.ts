@@ -1,6 +1,8 @@
 import HttpClient from '../src';
 import nock from 'nock';
 
+import { version } from '../package.json';
+
 test('create instance', async () => {
   expect(new HttpClient()).toStrictEqual(expect.any(HttpClient));
 });
@@ -89,5 +91,26 @@ describe('middleware', () => {
 
     expect(mockMiddleware.mock.calls.length).toBe(1);
     expect(mockMiddleware).toBeCalledWith(expect.any(HttpClient.Context), expect.any(Function));
+  });
+});
+
+describe('other static properties', () => {
+  test('version', () => {
+    expect(HttpClient.version).toBe(version);
+  });
+  test('Model', () => {
+    expect(HttpClient.Model).toBeInstanceOf(Function);
+  });
+  test('Exception', () => {
+    expect(HttpClient.Exception).toBeInstanceOf(Function);
+  });
+  test('Context', () => {
+    expect(HttpClient.Context).toBeInstanceOf(Function);
+  });
+  test('mergeOptions', () => {
+    expect(HttpClient.mergeOptions).toBeInstanceOf(Function);
+  });
+  test('compose', () => {
+    expect(HttpClient.compose).toBeInstanceOf(Function);
   });
 });
