@@ -21,8 +21,9 @@ export const fetchMiddleware = <T>(ctx: Context<T>, next: Next) => {
     if (isPlainJSON(data)) {
       setIfNull(headers, 'Content-Type', 'application/json;charset=UTF-8');
       request.body = JSON.stringify(data);
+    } else {
+      request.body = data;
     }
-    request.body = data;
   }
 
   return fetch(href, request)
