@@ -92,6 +92,17 @@ describe('middleware', () => {
     expect(mockMiddleware.mock.calls.length).toBe(1);
     expect(mockMiddleware).toBeCalledWith(expect.any(HttpClient.Context), expect.any(Function));
   });
+
+  test('next() can only be called once in one middleware', async () => {
+    const [baseURL, url] = ['https://api.myservice.com/', '/middleware/next'];
+    nock(baseURL).get(url).reply(200);
+    const http = new HttpClient({ baseURL });
+    http.use(async (_, next) => {
+      await next();
+      await next();
+    });
+    await expect(() => http.get(url)).rejects.toThrow(Error);
+  });
 });
 
 describe('other static properties', () => {

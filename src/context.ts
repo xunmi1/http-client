@@ -3,6 +3,7 @@ import { RequestOptions } from './interfaces';
 // Since some properties of `Request` are read-only, use `RequestOptions`
 export interface ContextRequest extends RequestOptions {
   url: string;
+  // `params` and `headers` are necessary to narrow the range of types
   params: URLSearchParams;
   headers: Headers;
 }

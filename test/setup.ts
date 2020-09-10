@@ -1,4 +1,5 @@
-import 'isomorphic-fetch';
+import 'cross-fetch/polyfill';
+import 'node-fetch';
 import nock from 'nock';
 
 /**

@@ -50,9 +50,7 @@ const mergeParams = (val1: RequestParams, val2: RequestParams) => {
 const createSearchParams = (val: RequestParams): URLSearchParams => {
   if (isPlainObject(val)) {
     const searchParams = new URLSearchParams();
-    Object.keys(val).forEach(k => {
-      flatParams(searchParams, k, val[k]);
-    });
+    Object.keys(val).forEach(k => flatParams(searchParams, k, val[k]));
     return searchParams;
   }
   // val is any[][] | string | URLSearchParams
@@ -66,10 +64,10 @@ const flatParams = (searchParams: URLSearchParams, key: string, val: any): void 
   // { x: [1, 2] } -> 'x=1&x=2'
   if (isArray(val)) return val.forEach(v => flatParams(searchParams, key, v));
   // { x: { y: { z: 1 } } } -> 'x[y][z]=1'
-  if (isObject(val))
-    return Object.keys(val).forEach(k => {
-      flatParams(searchParams, `${key}[${k}]`, val[k]);
-    });
+  if (isObject(val)) {
+    Object.keys(val).forEach(k => flatParams(searchParams, `${key}[${k}]`, val[k]));
+    return;
+  }
   searchParams.append(key, val);
 };
 
