@@ -83,8 +83,13 @@ export const deepMerge = function (target: any, source: any) {
 };
 
 const ABORT_ERROR_NAME = 'AbortError';
-export const isAborted = (val: unknown): val is DOMException =>
-  val instanceof DOMException && val.name === ABORT_ERROR_NAME;
+
+/**
+ * Request was aborted.
+ * On browsers, throw [DOMException](https://developer.mozilla.org/en-US/docs/Web/API/DOMException).
+ * When using [node-fetch](https://github.com/node-fetch/node-fetch), throw [AbortError](https://github.com/node-fetch/node-fetch/blob/master/docs/ERROR-HANDLING.md).
+ */
+export const isAborted = (val: unknown): val is DOMException => val instanceof Error && val.name === ABORT_ERROR_NAME;
 
 export const promisify = <T extends (...args: any[]) => any>(fn: T) => (
   ...args: Parameters<T>
