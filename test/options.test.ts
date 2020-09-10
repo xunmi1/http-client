@@ -99,3 +99,66 @@ describe('data', () => {
     expect(data.byteLength).toBe(requestData.byteLength);
   });
 });
+
+describe('timeout', () => {
+  const Exception = HttpClient.Exception;
+
+  test('merge timeout option', async () => {
+    const defaultTimeout = 10000;
+    const http = new HttpClient({ baseURL, timeout: defaultTimeout });
+    // @ts-ignore
+    expect(http.defaults.timeout).toBe(defaultTimeout);
+
+    const mockMiddleware = jest.fn((ctx: any, next: any) => next());
+    http.use(mockMiddleware);
+    const [timeout, url] = [15000, '/timeout/merge'];
+    scope.get(url).reply(200);
+    await http.get(url, { timeout });
+    const ctx = mockMiddleware.mock.calls[0][0];
+    expect(ctx.request.timeout).toBe(timeout);
+  });
+
+  test('timeout must be within a safe value range', async () => {
+    const http = new HttpClient({ baseURL });
+    try {
+      await http.get('timeout/unsafe', { timeout: Infinity });
+    } catch (err) {
+      expect(err).toBeInstanceOf(Exception);
+      expect(err.type).toBe(Exception.Types.TYPE_ERROR);
+    }
+  });
+
+  test('timed out', async () => {
+    const http = new HttpClient({ baseURL });
+    const url = '/timeout/timed';
+    scope.get(url).delayConnection(80).reply(200);
+    try {
+      await http.get(url, { timeout: 40 });
+    } catch (err) {
+      expect(err).toBeInstanceOf(Exception);
+      expect(err.type).toBe(Exception.Types.TIMEOUT_ERROR);
+    }
+  });
+
+  test('timeout is false', async () => {
+    const http = new HttpClient({ baseURL });
+    const url = '/timeout/false';
+    scope.get(url).reply(200);
+    const { status } = await http.get(url, { timeout: false });
+    expect(status).toBe(200);
+  });
+
+  test('early abort request with timeout', async () => {
+    const controller = new AbortController();
+    const http = new HttpClient({ baseURL });
+    const url = '/timeout/abort';
+    scope.get(url).delayConnection(150).reply(200);
+    try {
+      setTimeout(() => controller.abort(), 50);
+      await http.get(url, { timeout: 100, signal: controller.signal });
+    } catch (err) {
+      expect(err).toBeInstanceOf(Exception);
+      expect(err.type).toBe(Exception.Types.ABORT_ERROR);
+    }
+  });
+});
