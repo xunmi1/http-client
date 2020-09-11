@@ -8,11 +8,7 @@ const isWithinRange = (val: number, floor: number, ceiling: number) => val >= fl
 const replaceSignal = (ctx: Context, controller: AbortController) => {
   const signal = ctx.request.signal;
   if (signal instanceof AbortSignal && !signal.aborted) {
-    const abort = () => {
-      controller.abort();
-      signal.removeEventListener('abort', abort);
-    };
-    signal.addEventListener('abort', abort);
+    signal.addEventListener('abort', () => controller.abort(), { once: true });
   }
 
   ctx.request.signal = controller.signal;

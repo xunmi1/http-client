@@ -20,6 +20,24 @@ describe('method', () => {
   });
 });
 
+describe('headers', () => {
+  test('type of headers is Headers', () => {
+    // @ts-ignore
+    expect(new HttpClient().defaults.headers).toBeInstanceOf(Headers);
+  });
+
+  test('merge default headers and request headers', async () => {
+    const url = '/headers/default-request';
+    scope.get(url).reply(200);
+    const mockMiddleware = jest.fn((ctx: any, next: any) => next());
+    const http = new HttpClient({ baseURL, headers: { x: '1', y: '1' } }).use(mockMiddleware);
+    await http.get(url, { headers: { x: '2' } });
+    const headers: Headers = mockMiddleware.mock.calls[0][0].request.headers;
+    expect(headers.get('x')).toBe('2');
+    expect(headers.get('y')).toBe('1');
+  });
+});
+
 describe('params', () => {
   const startQueryServer = (url: string) => {
     scope
@@ -43,7 +61,7 @@ describe('params', () => {
     expect(defaultParams.getAll('y[z]')).toEqual([]);
     expect(defaultParams.getAll('y[z][z1]')).toEqual(['1']);
 
-    const url = '/default-request';
+    const url = '/params/default-request';
     startQueryServer(url);
     const { data } = await http.get(url, { params: { x: 2, y: [2, { z: 2 }] }, responseType: 'text' });
     const receivedParams = new URLSearchParams(data);
@@ -55,7 +73,7 @@ describe('params', () => {
 
   test('merge request params and url params', async () => {
     const http = new HttpClient({ baseURL });
-    const url = '/request-url';
+    const url = '/params/request-url';
     const urlWithParams = `${url}?x=1&y=1&z=`;
     const params = { x: 2, y: [2, 3] };
     startQueryServer(url);
