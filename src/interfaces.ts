@@ -15,7 +15,7 @@ export interface RequestOptions extends RequestInit {
   responseType?: ResponseType;
   data?: Record<string | number, any> | any[] | BodyInit;
   params?: any[][] | Record<string, any> | string | URLSearchParams;
-  timeout?: number | false;
+  timeout?: number;
   onDownloadProgress?: DownloadProgressEvent;
   // Convenient for users to expand the configuration
   [key: string]: any;

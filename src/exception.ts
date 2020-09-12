@@ -1,23 +1,17 @@
-import { Context } from './interfaces';
-
-export enum ExceptionTypes {
-  HTTP_ERROR = 'HttpError',
-  TYPE_ERROR = 'TypeError',
-  ABORT_ERROR = 'AbortError',
-  TIMEOUT_ERROR = 'TimeoutError',
-  PARSE_ERROR = 'ParseError',
-  UNKNOWN_ERROR = 'UnknownError',
-}
+import { Context } from './context';
 
 export class Exception<T = any> extends Error {
-  public static readonly Types = ExceptionTypes;
   public readonly context;
-  public readonly type;
 
-  constructor(error: string | Error, type: ExceptionTypes, context: Context<T>) {
+  public static readonly HTTP_ERROR = 'HttpError';
+  public static readonly NETWORK_ERROR = 'NetworkError';
+  public static readonly ABORT_ERROR = 'AbortError';
+  public static readonly TIMEOUT_ERROR = 'TimeoutError';
+  public static readonly PARSE_ERROR = 'ParseError';
+
+  constructor(error: string | Error, name: string, context: Context<T>) {
     super(error instanceof Error ? error.message : error);
-    this.name = this.constructor.name;
-    this.type = type;
+    this.name = name;
     this.context = context;
   }
 }

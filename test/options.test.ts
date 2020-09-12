@@ -141,8 +141,7 @@ describe('timeout', () => {
     try {
       await http.get('timeout/unsafe', { timeout: Infinity });
     } catch (err) {
-      expect(err).toBeInstanceOf(Exception);
-      expect(err.type).toBe(Exception.Types.TYPE_ERROR);
+      expect(err).toBeInstanceOf(RangeError);
     }
   });
 
@@ -154,16 +153,8 @@ describe('timeout', () => {
       await http.get(url, { timeout: 40 });
     } catch (err) {
       expect(err).toBeInstanceOf(Exception);
-      expect(err.type).toBe(Exception.Types.TIMEOUT_ERROR);
+      expect(err.name).toBe(Exception.TIMEOUT_ERROR);
     }
-  });
-
-  test('timeout is false', async () => {
-    const http = new HttpClient({ baseURL });
-    const url = '/timeout/false';
-    scope.get(url).reply(200);
-    const { status } = await http.get(url, { timeout: false });
-    expect(status).toBe(200);
   });
 
   test('early abort request with timeout', async () => {
@@ -176,7 +167,7 @@ describe('timeout', () => {
       await http.get(url, { timeout: 100, signal: controller.signal });
     } catch (err) {
       expect(err).toBeInstanceOf(Exception);
-      expect(err.type).toBe(Exception.Types.ABORT_ERROR);
+      expect(err.name).toBe(Exception.ABORT_ERROR);
     }
   });
 });

@@ -1,6 +1,6 @@
 export * from './interfaces';
 export type { Context, ContextRequest, ContextResponse } from './context';
-export type { Exception, ExceptionTypes } from './exception';
+export type { Exception } from './exception';
 export type { Model } from './model';
 
 import { HttpClient, RequestMethod } from './http.client';

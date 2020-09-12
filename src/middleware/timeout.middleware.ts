@@ -19,11 +19,13 @@ const replaceSignal = (ctx: Context, controller: AbortController) => {
  */
 export const timeoutMiddleware = <T>(ctx: Context<T>, next: Next) => {
   const timeout = ctx.request.timeout;
-  if (!isNumber(timeout)) return next();
+  if (timeout == null) return next();
+  if (!isNumber(timeout)) {
+    throw new TypeError(`The timeout option must be a number`);
+  }
 
   if (!isWithinRange(timeout, 0, MAX_SAFE_TIMEOUT)) {
-    const message = `The timeout of ${timeout}ms not to be within range ${0} - ${MAX_SAFE_TIMEOUT}ms.`;
-    throw new Exception(message, Exception.Types.TYPE_ERROR, ctx);
+    throw new RangeError(`The timeout of ${timeout}ms not to be within range ${0} - ${MAX_SAFE_TIMEOUT}ms.`);
   }
 
   const controller = new AbortController();
@@ -31,7 +33,7 @@ export const timeoutMiddleware = <T>(ctx: Context<T>, next: Next) => {
 
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
-      reject(new Exception(`The timeout of ${timeout}ms exceeded.`, Exception.Types.TIMEOUT_ERROR, ctx));
+      reject(new Exception(`The timeout of ${timeout}ms exceeded.`, Exception.TIMEOUT_ERROR, ctx));
       controller.abort();
     }, timeout);
 

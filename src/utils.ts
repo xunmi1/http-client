@@ -83,13 +83,22 @@ export const deepMerge = function (target: any, source: any) {
 };
 
 const ABORT_ERROR_NAME = 'AbortError';
-
 /**
  * Request was aborted.
  * On browsers, throw [DOMException](https://developer.mozilla.org/en-US/docs/Web/API/DOMException).
- * When using [node-fetch](https://github.com/node-fetch/node-fetch), throw [AbortError](https://github.com/node-fetch/node-fetch/blob/master/docs/ERROR-HANDLING.md).
+ * When using [`node-fetch`](https://github.com/node-fetch/node-fetch), throw [AbortError](https://github.com/node-fetch/node-fetch/blob/master/docs/ERROR-HANDLING.md).
  */
 export const isAborted = (val: unknown): val is DOMException => val instanceof Error && val.name === ABORT_ERROR_NAME;
+
+/**
+ * Network Error.
+ * error message:
+ * - Chrome: 'Failed to fetch'
+ * - Firefox: 'NetworkError when attempting to fetch resource.'
+ * - [`whatwg-fetch`](https://github.com/github/fetch): 'Network request failed'
+ */
+export const isNetworkError = (val: unknown): val is Error =>
+  val instanceof TypeError && val.message.search(/network|fetch/i) > -1;
 
 export const promisify = <T extends (...args: any[]) => any>(fn: T) => (
   ...args: Parameters<T>

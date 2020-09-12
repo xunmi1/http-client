@@ -8,7 +8,7 @@ const CONTENT_LENGTH = 'content-length';
  */
 export const downloadMiddleware = <T>(ctx: Context<T>, next: Next) => {
   const notice = ctx.request.onDownloadProgress;
-  if (!notice || !isFunction(notice)) return next();
+  if (!isFunction(notice)) return next();
 
   const noticeAsync = promisify(notice);
 
