@@ -1,18 +1,18 @@
 import { Next, Context } from '../interfaces';
 import { isPlainJSON, setIfNull } from '../utils';
 
-const composeParams = (params: URLSearchParams, url: string, baseURL?: string) => {
-  const result = new URL(url, baseURL);
-  const searchParams = result.searchParams;
-  // Append and not overwrite
-  params.forEach((v, k) => searchParams.append(k, v));
-  return result;
+const composeURL = (params: URLSearchParams, url: string, baseURL?: string) => {
+  const hashIndex = url.indexOf('#');
+  if (hashIndex > -1) url = url.slice(0, hashIndex);
+  const serialized = params.toString();
+  if (serialized !== '') url += (url.includes('?') ? '&' : '?') + serialized;
+  return baseURL != null ? new URL(url, baseURL).href : url;
 };
 
 export const fetchMiddleware = <T>(ctx: Context<T>, next: Next) => {
   const request = ctx.request;
   const { baseURL, url, params, data, headers } = request;
-  const { href } = composeParams(params, url, baseURL);
+  const requestURL = composeURL(params, url, baseURL);
 
   // default common headers
   setIfNull(headers, 'Accept', 'application/json, text/plain, */*');
@@ -26,7 +26,7 @@ export const fetchMiddleware = <T>(ctx: Context<T>, next: Next) => {
     }
   }
 
-  return fetch(href, request)
+  return fetch(requestURL, request)
     .then(response => {
       ctx.response = response;
     })
