@@ -8,7 +8,10 @@ const CONTENT_LENGTH = 'content-length';
  */
 export const downloadMiddleware = <T>(ctx: Context<T>, next: Next) => {
   const notice = ctx.request.onDownloadProgress;
-  if (!isFunction(notice)) return next();
+  if (notice == null) return next();
+  if (!isFunction(notice)) {
+    throw new TypeError('The onDownloadProgress option must be a function');
+  }
 
   const noticeAsync = promisify(notice);
 

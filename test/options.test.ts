@@ -1,6 +1,7 @@
 import HttpClient from '../src';
 import nock from 'nock';
 
+const Exception = HttpClient.Exception;
 const baseURL = 'https://merge.com';
 const scope = nock(baseURL).replyContentLength();
 
@@ -119,8 +120,6 @@ describe('data', () => {
 });
 
 describe('timeout', () => {
-  const Exception = HttpClient.Exception;
-
   test('merge timeout option', async () => {
     const defaultTimeout = 10000;
     const http = new HttpClient({ baseURL, timeout: defaultTimeout });
@@ -141,7 +140,8 @@ describe('timeout', () => {
     try {
       await http.get('timeout/unsafe', { timeout: Infinity });
     } catch (err) {
-      expect(err).toBeInstanceOf(RangeError);
+      expect(err).toBeInstanceOf(Exception);
+      expect(err.name).toBe('RangeError');
     }
   });
 

@@ -4,7 +4,6 @@ export class Exception<T = any> extends Error {
   public readonly context;
 
   public static readonly HTTP_ERROR = 'HttpError';
-  public static readonly NETWORK_ERROR = 'NetworkError';
   public static readonly ABORT_ERROR = 'AbortError';
   public static readonly TIMEOUT_ERROR = 'TimeoutError';
   public static readonly PARSE_ERROR = 'ParseError';
