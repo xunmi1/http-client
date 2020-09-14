@@ -3,13 +3,14 @@ import nock from 'nock';
 
 import { version } from '../package.json';
 
+const baseURL = 'https://api.myservice.com/';
+const scope = nock(baseURL).replyContentLength();
+
 test('create instance', async () => {
   expect(new HttpClient()).toStrictEqual(expect.any(HttpClient));
 });
 
 describe('request method', () => {
-  const baseURL = 'https://api.myservice.com/';
-  const scope = nock(baseURL).replyContentLength();
   const http = new HttpClient({ baseURL });
   const body = { text: 'hello world!' };
 
@@ -79,8 +80,8 @@ describe('middleware', () => {
   });
 
   test('use middleware', async () => {
-    const [baseURL, url] = ['https://api.myservice.com/', '/middleware/instance'];
-    nock(baseURL).get(url).times(2).reply(200);
+    const url = '/middleware/instance';
+    scope.get(url).times(2).reply(200);
 
     const mockMiddleware = jest.fn((ctx: any, next: any) => next());
 
@@ -94,8 +95,8 @@ describe('middleware', () => {
   });
 
   test('next() can only be called once in one middleware', async () => {
-    const [baseURL, url] = ['https://api.myservice.com/', '/middleware/next'];
-    nock(baseURL).get(url).reply(200);
+    const url = '/middleware/next';
+    scope.get(url).reply(200);
     const http = new HttpClient({ baseURL });
     http.use(async (_, next) => {
       await next();

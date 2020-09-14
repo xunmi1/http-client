@@ -2,8 +2,38 @@ import HttpClient from '../src';
 import nock from 'nock';
 
 const Exception = HttpClient.Exception;
-const baseURL = 'https://merge.com';
+const baseURL = 'https://merge.com/';
 const scope = nock(baseURL).replyContentLength();
+
+describe('url', () => {
+  const startURLServer = (url: string) => {
+    scope.get(url).reply(200, v => v);
+  };
+
+  test('only has url', async () => {
+    const http = new HttpClient();
+    const url = '/url/only-url';
+    startURLServer(url);
+    const { data } = await http.get('https://merge.com/url/only-url', { responseType: 'text' });
+    expect(data).toBe(url);
+  });
+
+  test('url and baseURL', async () => {
+    const http = new HttpClient({ baseURL: baseURL + 'url/' });
+    const url = '/url/url-base';
+    startURLServer(url);
+    const { data } = await http.get('url-base', { responseType: 'text' });
+    expect(data).toBe(url);
+  });
+
+  test('url has hash', async () => {
+    const http = new HttpClient();
+    const url = '/url/hash';
+    startURLServer(url);
+    const { data } = await http.get('https://merge.com/url/hash#a', { responseType: 'text' });
+    expect(data).toBe(url);
+  });
+});
 
 describe('method', () => {
   test('type of method is string', () => {
@@ -75,7 +105,7 @@ describe('params', () => {
   test('merge request params and url params', async () => {
     const http = new HttpClient({ baseURL });
     const url = '/params/request-url';
-    const urlWithParams = `${url}?x=1&y=1&z=`;
+    const urlWithParams = `${url}?x=1&y=1&z=#a`;
     const params = { x: 2, y: [2, 3] };
     startQueryServer(url);
     const { data } = await http.get(urlWithParams, { params, responseType: 'text' });
@@ -135,10 +165,21 @@ describe('timeout', () => {
     expect(ctx.request.timeout).toBe(timeout);
   });
 
+  test('timeout must be a number', async () => {
+    const http = new HttpClient({ baseURL });
+    try {
+      // @ts-ignore
+      await http.get('timeout/number', { timeout: '' });
+    } catch (err) {
+      expect(err).toBeInstanceOf(Exception);
+      expect(err.name).toBe('TypeError');
+    }
+  });
+
   test('timeout must be within a safe value range', async () => {
     const http = new HttpClient({ baseURL });
     try {
-      await http.get('timeout/unsafe', { timeout: Infinity });
+      await http.get('timeout/unsafe', { timeout: -1 });
     } catch (err) {
       expect(err).toBeInstanceOf(Exception);
       expect(err.name).toBe('RangeError');
