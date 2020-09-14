@@ -1,20 +1,13 @@
 import { Next, Context, ResponseType } from '../interfaces';
 import { Exception } from '../exception';
-import { isFunction } from '../utils';
+import { isFunction, parseJSON } from '../utils';
 
 const parse = <T>(ctx: Context, type: ResponseType): Promise<T> => {
   const cloned = ctx.response!.clone();
   if (type === 'json') {
-    // response data may be an empty string
-    return cloned.text().then(data => {
-      try {
-        return data && JSON.parse(data);
-      } catch (error) {
-        throw new Exception(error, Exception.PARSE_ERROR, ctx);
-      }
-    });
+    return cloned.text().then(parseJSON);
   }
-  return (cloned[type]() as unknown) as Promise<T>;
+  return cloned[type]();
 };
 
 export const parseFetchMiddleware = <T>(ctx: Context<T>, next: Next) => {
@@ -23,18 +16,18 @@ export const parseFetchMiddleware = <T>(ctx: Context<T>, next: Next) => {
     throw new TypeError(`The responseType of '${type}' is not supported`);
   }
 
-  return next().then(
-    (): Promise<void> => {
-      const response = ctx.response!;
-
-      if (!response.ok) {
-        const message = `Request failed with status code ${ctx.status}.`;
+  return next().then(() =>
+    parse(ctx, type)
+      .then(data => {
+        ctx.response!.data = data;
+      })
+      .catch(error => {
+        throw new Exception(error, Exception.PARSE_ERROR, ctx);
+      })
+      .finally(() => {
+        if (ctx.response!.ok) return;
+        const message = `Request failed with status code ${ctx.status}`;
         throw new Exception(message, Exception.HTTP_ERROR, ctx);
-      }
-
-      return parse<T>(ctx, type).then(data => {
-        response.data = data;
-      });
-    }
+      })
   );
 };

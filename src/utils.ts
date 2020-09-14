@@ -85,3 +85,11 @@ export const deepMerge = function (target: any, source: any) {
 export const promisify = <T extends (...args: any[]) => any>(fn: T) => (
   ...args: Parameters<T>
 ): Promise<ReturnType<T>> => Promise.resolve().then(() => fn(...args));
+
+export const parseJSON = (text: string): any => {
+  try {
+    return text && JSON.parse(text);
+  } catch {
+    return text;
+  }
+};
