@@ -6,13 +6,13 @@ export const hasOwn = (val: object, key: string | symbol): key is keyof typeof v
 const objectToString = Object.prototype.toString;
 const toRawType = (val: unknown): string => objectToString.call(val).slice(8, -1);
 
-const isPlainObject = (val: unknown): val is object => toRawType(val) === 'Object';
-export const isPlainJSON = (val: unknown): val is object | any[] => isPlainObject(val) || isArray(val);
+const isPlainObject = (val: unknown): val is Record<any, any> => toRawType(val) === 'Object';
+export const isPlainJSON = (val: unknown): val is Record<any, any> | any[] => isPlainObject(val) || isArray(val);
 
 export const isNumber = (val: unknown): val is number => typeof val === 'number';
 export const isFunction = (val: unknown): val is Function => typeof val === 'function';
 export const isArray = Array.isArray;
-export const isObject = (val: unknown): val is Record<any, any> => val !== null && typeof val === 'object';
+export const isObject = (val: unknown): val is object => val !== null && typeof val === 'object';
 
 export const setIfNull = (target: Headers | URLSearchParams, key: string, value: string) => {
   if (!target.has(key)) target.append(key, value);
@@ -71,15 +71,15 @@ const flatParams = (searchParams: URLSearchParams, key: string, val: any): void 
   searchParams.append(key, val);
 };
 
-export const deepMerge = function (target: any, source: any) {
-  if (toRawType(target) === toRawType(source) && isObject(target)) {
+export const deepMerge = <T1 = any, T2 = any>(target: T1, source: T2): T1 & T2 => {
+  if (toRawType(target) === toRawType(source) && isObject(source)) {
     Object.keys(target).forEach(key => {
       const value = target[key];
       source[key] = hasOwn(source, key) ? deepMerge(value, source[key]) : value;
     });
   }
 
-  return source;
+  return source as T1 & T2;
 };
 
 export const promisify = <T extends (...args: any[]) => any>(fn: T) => (

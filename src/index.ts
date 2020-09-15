@@ -1,5 +1,5 @@
 export * from './interfaces';
-export type { Context, ContextRequest, ContextResponse } from './context';
+export type { Context, ContextOptions, ContextRequest, ContextResponse } from './context';
 export type { Exception } from './exception';
 export type { Model } from './model';
 

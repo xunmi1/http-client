@@ -1,8 +1,8 @@
-import { Next, Context, ResponseType } from '../interfaces';
+import { Next, Context, ResponseType, ResponseData } from '../interfaces';
 import { Exception } from '../exception';
 import { isFunction, parseJSON } from '../utils';
 
-const parse = <T>(ctx: Context, type: ResponseType): Promise<T> => {
+const parse = <T extends ResponseType>(ctx: Context, type: T): Promise<ResponseData<T>> => {
   const cloned = ctx.response!.clone();
   if (type === 'json') {
     return cloned.text().then(parseJSON);
@@ -10,7 +10,7 @@ const parse = <T>(ctx: Context, type: ResponseType): Promise<T> => {
   return cloned[type]();
 };
 
-export const parseFetchMiddleware = <T>(ctx: Context<T>, next: Next) => {
+export const parseFetchMiddleware = (ctx: Context, next: Next) => {
   const type = ctx.request.responseType ?? 'json';
   if (!isFunction(Response.prototype[type])) {
     throw new TypeError(`The responseType of '${type}' is not supported`);

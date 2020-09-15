@@ -1,7 +1,7 @@
 import { Next, Context } from '../interfaces';
 import { isPlainJSON, setIfNull } from '../utils';
 
-const composeURL = (params: URLSearchParams, url: string, baseURL?: string) => {
+const composeURL = (params: URLSearchParams, url: string, baseURL?: string): string => {
   const hashIndex = url.indexOf('#');
   if (hashIndex > -1) url = url.slice(0, hashIndex);
   const serialized = params.toString();
@@ -9,7 +9,7 @@ const composeURL = (params: URLSearchParams, url: string, baseURL?: string) => {
   return baseURL != null ? new URL(url, baseURL).href : url;
 };
 
-export const fetchMiddleware = <T>(ctx: Context<T>, next: Next) => {
+export const fetchMiddleware = (ctx: Context, next: Next) => {
   const request = ctx.request;
   const { baseURL, url, params, data, headers } = request;
   const requestURL = composeURL(params, url, baseURL);

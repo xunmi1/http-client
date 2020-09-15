@@ -6,7 +6,7 @@ const CONTENT_LENGTH = 'content-length';
 /**
  * Implement `onDownloadProgress` feature
  */
-export const downloadMiddleware = <T>(ctx: Context<T>, next: Next) => {
+export const downloadMiddleware = (ctx: Context, next: Next) => {
   const notice = ctx.request.onDownloadProgress;
   if (notice == null) return next();
   if (!isFunction(notice)) {
@@ -22,7 +22,7 @@ export const downloadMiddleware = <T>(ctx: Context<T>, next: Next) => {
 
     let loaded = 0;
     const reader = readableStream.getReader();
-    const read = (): Promise<undefined> =>
+    const read = (): Promise<void> =>
       reader.read().then(({ value, done }) => {
         loaded += value?.length ?? 0;
         // Avoid blocking the current queue

@@ -2,7 +2,7 @@ import compose from './compose';
 import { isFunction } from '../utils';
 import { Middleware } from '../interfaces';
 
-export abstract class Model<C> {
+export abstract class Model<C = any> {
   static readonly compose = compose;
   protected readonly middlewareStack: Middleware<C>[] = [];
   protected abstract readonly coreMiddleware: Middleware<C>;

@@ -1,7 +1,11 @@
-import { RequestOptions } from './interfaces';
+import { RequestOptions, ResponseType, ResponseData } from './interfaces';
+
+export interface ContextOptions<T> extends RequestOptions {
+  responseType?: T extends ResponseType ? T : never;
+}
 
 // Since some properties of `Request` are read-only, use `RequestOptions`
-export interface ContextRequest extends RequestOptions {
+export interface ContextRequest<T> extends ContextOptions<T> {
   url: string;
   // `params` and `headers` are necessary to narrow the range of types
   params: URLSearchParams;
@@ -9,14 +13,14 @@ export interface ContextRequest extends RequestOptions {
 }
 
 export interface ContextResponse<T> extends Response {
-  data?: T;
+  data?: ResponseData<T>;
 }
 
 export class Context<T = any> {
-  public readonly request: ContextRequest;
+  public readonly request: ContextRequest<T>;
   public response?: ContextResponse<T>;
 
-  constructor(url: string, options: RequestOptions) {
+  constructor(url: string, options: ContextOptions<T>) {
     const params = new URLSearchParams(options.params);
     const headers = new Headers(options.headers);
     this.request = { ...options, url, params, headers };
