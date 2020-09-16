@@ -1,7 +1,52 @@
-import { Next, Context } from '../interfaces';
-import { isFunction, promisify } from '../utils';
+import type { Readable } from 'stream';
+import { Next, Context, DownloadProgressEvent } from '../interfaces';
+import { toRawType, isFunction, promisify } from '../utils';
+
+const isNodeEnv = typeof process !== 'undefined' && toRawType(process) === 'process';
 
 const CONTENT_LENGTH = 'content-length';
+
+/* istanbul ignore next */
+const rendStreamBrowser = (response: Response, notice: DownloadProgressEvent) => {
+  const total = Number(response.headers?.get(CONTENT_LENGTH)) ?? 0;
+  const readableStream = response.body;
+  if (!readableStream || readableStream.locked) return;
+  let loaded = 0;
+  const reader = readableStream.getReader();
+  const read = (): Promise<void> =>
+    reader.read().then(({ value, done }) => {
+      loaded += value?.length ?? 0;
+      notice({ total, loaded, value, done });
+      if (!done) return read();
+    });
+
+  return read();
+};
+
+/**
+ * Because the total size cannot be obtained when in node environment, `total` will be equal to `loaded`.
+ * @see https://github.com/node-fetch/node-fetch#interface-body
+ */
+const rendStreamNode = (response: { body?: Readable }, notice: DownloadProgressEvent<Buffer>) => {
+  const readableStream = response.body;
+  if (!readableStream?.readable) return;
+  let loaded = 0;
+  return new Promise((resolve, reject) => {
+    readableStream.on('readable', () => {
+      let value: Buffer;
+      while ((value = readableStream.read())) {
+        loaded += value.length;
+        notice({ total: loaded, loaded, value, done: false });
+      }
+    });
+    readableStream.on('end', () => {
+      notice({ total: loaded, loaded, value: undefined, done: true });
+      resolve();
+    });
+    readableStream.on('close', resolve);
+    readableStream.on('error', reject);
+  });
+};
 
 /**
  * Implement `onDownloadProgress` feature
@@ -12,24 +57,12 @@ export const downloadMiddleware = (ctx: Context, next: Next) => {
   if (!isFunction(notice)) {
     throw new TypeError('The onDownloadProgress option must be a function');
   }
-
+  // Avoid blocking the current queue
   const noticeAsync = promisify(notice);
 
   return next().then(() => {
-    const total = Number(ctx.headers?.get(CONTENT_LENGTH)) ?? 0;
-    const readableStream = ctx.response!.clone().body;
-    if (!readableStream || readableStream.locked) return;
-
-    let loaded = 0;
-    const reader = readableStream.getReader();
-    const read = (): Promise<void> =>
-      reader.read().then(({ value, done }) => {
-        loaded += value?.length ?? 0;
-        // Avoid blocking the current queue
-        noticeAsync({ total, loaded, value, done });
-        if (!done) return read();
-      });
-
-    return read();
+    const response = ctx.response!.clone();
+    // @ts-ignore
+    return (isNodeEnv ? rendStreamNode : rendStreamBrowser)(response, noticeAsync);
   });
 };

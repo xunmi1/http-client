@@ -4,7 +4,7 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
 export const hasOwn = (val: object, key: string | symbol): key is keyof typeof val => hasOwnProperty.call(val, key);
 
 const objectToString = Object.prototype.toString;
-const toRawType = (val: unknown): string => objectToString.call(val).slice(8, -1);
+export const toRawType = (val: unknown): string => objectToString.call(val).slice(8, -1);
 
 const isPlainObject = (val: unknown): val is Record<any, any> => toRawType(val) === 'Object';
 export const isPlainJSON = (val: unknown): val is Record<any, any> | any[] => isPlainObject(val) || isArray(val);
