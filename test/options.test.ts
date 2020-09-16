@@ -212,3 +212,28 @@ describe('timeout', () => {
     }
   });
 });
+
+describe('onDownloadProgress', () => {
+  test('onDownloadProgress must be a function', async () => {
+    const http = new HttpClient({ baseURL });
+    try {
+      // @ts-ignore
+      await http.get('download-progress/function', { onDownloadProgress: -1 });
+    } catch (err) {
+      expect(err).toBeInstanceOf(Exception);
+      expect(err.name).toBe('TypeError');
+    }
+  });
+
+  test('should be called multiple times', async () => {
+    const http = new HttpClient({ baseURL });
+    const [url, body] = ['/download', 'x1234567890'];
+    scope.get(url).reply(200, body);
+    const onDownloadProgress = jest.fn();
+    const { data } = await http.get(url, { onDownloadProgress });
+    expect(data).toBe(body);
+    const calls = onDownloadProgress.mock.calls;
+    expect(calls[0][0].done).toBe(false);
+    expect(calls[calls.length - 1][0].done).toBe(true);
+  });
+});
