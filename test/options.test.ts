@@ -46,8 +46,12 @@ describe('method', () => {
     // @ts-ignore
     expect(http.defaults.method).toBe('POST');
     scope.delete('/method').reply(204);
-    const { status } = await http.delete('/method');
-    expect(status).toEqual(204);
+    let result = await http.delete('/method');
+    expect(result.status).toEqual(204);
+
+    scope.get('/method').reply(200);
+    result = await http.request('/method', { method: undefined });
+    expect(result.status).toEqual(200);
   });
 });
 
@@ -122,12 +126,12 @@ describe('data', () => {
   };
 
   test('merge default data and request data', async () => {
-    const defaultData = { x: 1, y: [1, { z: { z1: 1 } }] };
+    const defaultData = { x: 1, y: [1, { z: { z1: 1 } }], z: 1 };
     const http = new HttpClient({ baseURL, data: defaultData });
     const url = '/data/default-request';
     startBodyServer(url);
     const { data } = await http.post(url, { data: { x: 2, y: [2, { z: undefined }] } });
-    expect(data).toEqual({ x: 2, y: [2, { z: undefined }] });
+    expect(data).toEqual({ x: 2, y: [2, { z: undefined }], z: 1 });
   });
 
   test('use body first', async () => {
@@ -167,6 +171,7 @@ describe('timeout', () => {
 
   test('timeout must be a number', async () => {
     const http = new HttpClient({ baseURL });
+    expect.hasAssertions();
     try {
       // @ts-ignore
       await http.get('timeout/number', { timeout: '' });
@@ -178,6 +183,7 @@ describe('timeout', () => {
 
   test('timeout must be within a safe value range', async () => {
     const http = new HttpClient({ baseURL });
+    expect.hasAssertions();
     try {
       await http.get('timeout/unsafe', { timeout: -1 });
     } catch (err) {
@@ -189,9 +195,10 @@ describe('timeout', () => {
   test('timed out', async () => {
     const http = new HttpClient({ baseURL });
     const url = '/timeout/timed';
-    scope.get(url).delayConnection(80).reply(200);
+    scope.get(url).delayConnection(40).reply(200);
+    expect.hasAssertions();
     try {
-      await http.get(url, { timeout: 40 });
+      await http.get(url, { timeout: 20 });
     } catch (err) {
       expect(err).toBeInstanceOf(Exception);
       expect(err.name).toBe(Exception.TIMEOUT_ERROR);
@@ -202,10 +209,11 @@ describe('timeout', () => {
     const controller = new AbortController();
     const http = new HttpClient({ baseURL });
     const url = '/timeout/abort';
-    scope.get(url).delayConnection(150).reply(200);
+    scope.get(url).delayConnection(40).reply(200);
+    expect.hasAssertions();
     try {
-      setTimeout(() => controller.abort(), 50);
-      await http.get(url, { timeout: 100, signal: controller.signal });
+      setTimeout(() => controller.abort(), 20);
+      await http.get(url, { timeout: 30, signal: controller.signal });
     } catch (err) {
       expect(err).toBeInstanceOf(Exception);
       expect(err.name).toBe(Exception.ABORT_ERROR);
@@ -216,6 +224,7 @@ describe('timeout', () => {
 describe('onDownloadProgress', () => {
   test('onDownloadProgress must be a function', async () => {
     const http = new HttpClient({ baseURL });
+    expect.hasAssertions();
     try {
       // @ts-ignore
       await http.get('download-progress/function', { onDownloadProgress: -1 });
