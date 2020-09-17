@@ -18,7 +18,7 @@ export const setIfNull = (target: Headers | URLSearchParams, key: string, value:
   if (!target.has(key)) target.append(key, value);
 };
 
-export const mergeOptions = (val1: RequestOptions = {}, val2: RequestOptions = {}): RequestOptions => {
+export const mergeOptions = (val1: RequestOptions, val2: RequestOptions = {}): RequestOptions => {
   const merged = { ...val1, ...val2 };
   merged.headers = mergeHeaders(val1.headers, val2.headers);
   merged.params = mergeParams(val1.params, val2.params);
@@ -85,11 +85,3 @@ export const deepMerge = <T1 = any, T2 = any>(target: T1, source: T2): T1 & T2 =
 export const promisify = <T extends (...args: any[]) => any>(fn: T) => (
   ...args: Parameters<T>
 ): Promise<ReturnType<T>> => Promise.resolve().then(() => fn(...args));
-
-export const parseJSON = (text: string): any => {
-  try {
-    return text && JSON.parse(text);
-  } catch {
-    return text;
-  }
-};

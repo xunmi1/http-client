@@ -1,4 +1,4 @@
-import { Next, Context } from '../interfaces';
+import { Context, Middleware } from '../interfaces';
 import { Exception } from '../exception';
 import { isNumber } from '../utils';
 
@@ -19,7 +19,7 @@ const replaceSignal = (ctx: Context, controller: AbortController) => {
 /**
  * Implement `timeout` feature
  */
-export const timeoutMiddleware = (ctx: Context, next: Next) => {
+export const timeoutMiddleware: Middleware = (ctx, next) => {
   const timeout = ctx.request.timeout;
   if (timeout == null) return next();
   if (!isNumber(timeout)) {

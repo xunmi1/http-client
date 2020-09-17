@@ -20,7 +20,7 @@ export class Context<T = any> {
   public readonly request: ContextRequest<T>;
   public response?: ContextResponse<T>;
 
-  constructor(url: string, options: ContextOptions<T>) {
+  constructor(url: string, options: ContextOptions<T> = {}) {
     const params = new URLSearchParams(options.params);
     const headers = new Headers(options.headers);
     this.request = { ...options, url, params, headers };

@@ -1,4 +1,4 @@
-import { Next, Context } from '../interfaces';
+import { Middleware } from '../interfaces';
 import { isPlainJSON, setIfNull } from '../utils';
 
 const composeURL = (params: URLSearchParams, url: string, baseURL?: string): string => {
@@ -9,7 +9,7 @@ const composeURL = (params: URLSearchParams, url: string, baseURL?: string): str
   return baseURL != null ? new URL(url, baseURL).href : url;
 };
 
-export const fetchMiddleware = (ctx: Context, next: Next) => {
+export const fetchMiddleware: Middleware = (ctx, next) => {
   const request = ctx.request;
   const { baseURL, url, params, data, headers } = request;
   const requestURL = composeURL(params, url, baseURL);

@@ -1,5 +1,5 @@
 import type { Readable } from 'stream';
-import { Next, Context, DownloadProgressEvent } from '../interfaces';
+import { Middleware, DownloadProgressEvent } from '../interfaces';
 import { toRawType, isFunction, promisify } from '../utils';
 
 const isNodeEnv = typeof process !== 'undefined' && toRawType(process) === 'process';
@@ -51,7 +51,7 @@ const rendStreamNode = (response: { body?: Readable }, notice: DownloadProgressE
 /**
  * Implement `onDownloadProgress` feature
  */
-export const downloadMiddleware = (ctx: Context, next: Next) => {
+export const downloadMiddleware: Middleware = (ctx, next) => {
   const notice = ctx.request.onDownloadProgress;
   if (notice == null) return next();
   if (!isFunction(notice)) {
