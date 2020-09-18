@@ -26,10 +26,7 @@ export const parseFetchMiddleware = <T>(ctx: Context<T>, next: Next) => {
       .then(data => {
         response.data = data;
       })
-      .catch(error => {
-        /* istanbul ignore next */
-        throw new Exception(error, Exception.PARSE_ERROR, ctx);
-      })
+      .catch(/* istanbul ignore next */ error => Promise.reject(new Exception(error, Exception.PARSE_ERROR, ctx)))
       .finally(() => {
         if (response.ok) return;
         const message = `Request failed with status code ${ctx.status}`;

@@ -29,6 +29,7 @@ const rendStreamBrowser = (response: Response, notice: DownloadProgressEvent) =>
  */
 const rendStreamNode = (response: { body?: Readable }, notice: DownloadProgressEvent<Buffer>) => {
   const readableStream = response.body;
+  /* istanbul ignore if */
   if (!readableStream?.readable) return;
   let loaded = 0;
   return new Promise((resolve, reject) => {
@@ -63,6 +64,6 @@ export const downloadMiddleware: Middleware = (ctx, next) => {
   return next().then(() => {
     const response = ctx.response!.clone();
     // @ts-ignore
-    return (isNodeEnv ? rendStreamNode : rendStreamBrowser)(response, noticeAsync);
+    return (isNodeEnv ? rendStreamNode : /* istanbul ignore next */ rendStreamBrowser)(response, noticeAsync);
   });
 };

@@ -4,7 +4,7 @@ export interface ContextOptions<T> extends RequestOptions {
   responseType?: T extends ResponseType ? T : never;
 }
 
-// Since some properties of `Request` are read-only, use `RequestOptions`
+// Since some properties of `Request` are read-only, use `ContextOptions`
 export interface ContextRequest<T> extends ContextOptions<T> {
   url: string;
   // `params` and `headers` are necessary to narrow the range of types
