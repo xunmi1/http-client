@@ -1,4 +1,3 @@
-const prettierConfig = require('@xunmi/prettier-config');
 
 module.exports = {
   root: true,
@@ -13,10 +12,11 @@ module.exports = {
     // Uses `eslint-config-prettier` to disable ESLint rules from `@typescript-eslint/eslint-plugin`
     'prettier/@typescript-eslint',
     // Must always be last
-    "plugin:prettier/recommended",
+    'plugin:prettier/recommended',
   ],
   env: {
     node: true,
+    browser: true,
     jest: true,
   },
   rules: {
@@ -24,8 +24,6 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/ban-types': 'off',
-    "@typescript-eslint/ban-ts-comment": 'off',
-
-    'prettier/prettier': ['warn', prettierConfig],
+    '@typescript-eslint/ban-ts-comment': 'off',
   },
 };

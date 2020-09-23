@@ -4,8 +4,7 @@ import { terser } from 'rollup-plugin-terser';
 import { version, author } from '../package.json';
 
 const currentYear = new Date().getFullYear();
-const banner =
-`/*!
+const banner = `/*!
  * http-client v${version}
  * (c) ${currentYear > 2020 ? '2020-' : ''}${currentYear} ${author}
  * Released under the MIT License.
@@ -27,9 +26,5 @@ const output = outputFileList.map(({ name, format, min, ...options }) => {
 
 export default {
   output,
-  plugins: [
-    json(),
-    resolve(),
-  ],
+  plugins: [json(), resolve()],
 };
-

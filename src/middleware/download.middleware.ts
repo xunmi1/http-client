@@ -1,4 +1,3 @@
-import type { Readable } from 'stream';
 import { Middleware, DownloadProgressEvent } from '../interfaces';
 import { toRawType, isFunction, promisify } from '../utils';
 
@@ -27,7 +26,7 @@ const rendStreamBrowser = (response: Response, notice: DownloadProgressEvent) =>
  * Because the total size cannot be obtained when in node environment, `total` will be equal to `loaded`.
  * @see https://github.com/node-fetch/node-fetch#interface-body
  */
-const rendStreamNode = (response: { body?: Readable }, notice: DownloadProgressEvent<Buffer>) => {
+const rendStreamNode = (response: { body?: any }, notice: DownloadProgressEvent<Buffer>) => {
   const readableStream = response.body;
   /* istanbul ignore if */
   if (!readableStream?.readable) return;
@@ -63,7 +62,6 @@ export const downloadMiddleware: Middleware = (ctx, next) => {
 
   return next().then(() => {
     const response = ctx.response!.clone();
-    // @ts-ignore
     return (isNodeEnv ? rendStreamNode : /* istanbul ignore next */ rendStreamBrowser)(response, noticeAsync);
   });
 };
