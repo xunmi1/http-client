@@ -9,11 +9,11 @@ An HTTP client based on the [Fetch API](https://developer.mozilla.org/docs/Web/A
 
 The target is modern browsers. For isomorphic usage, you can polyfill (make sure to polyfill the global environment), for example: [cross fetch](https://github.com/lquixada/cross-fetch).
 
-- Parameter serialization
-- Transform response data
-- Timeout support
-- Middleware support
-- Download progress support
+- [Parameter serialization](#request-options)
+- [Transform response data](#default-return-value)
+- [Timeout support](#request-options)
+- [Middleware support](#middleware)
+- [Download progress support](#request-options)
 
 ## Install
 
@@ -28,7 +28,7 @@ The target is modern browsers. For isomorphic usage, you can polyfill (make sure
 - CDN
 
   ```html
-  <script src="https://cdn.jsdelivr.net/npm/@xunmi/http-client/dist/http-client.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@xunmi/http-client"></script>
   ```
 
 ## Usage
@@ -121,7 +121,7 @@ The response for a request contains the following information.
 
 ```ts
 interface ReturnValue {
-  // the server's response data.
+  // The server's response data.
   data: any;
   // The status code of the response.
   status: number;
