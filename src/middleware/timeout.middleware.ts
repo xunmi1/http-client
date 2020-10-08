@@ -2,8 +2,8 @@ import { Context, Middleware } from '../interfaces';
 import { Exception } from '../exception';
 import { isNumber } from '../utils';
 
-const MAX_SAFE_TIMEOUT = 2 ** 31 - 1;
-const MiN_SAFE_TIMEOUT = 0;
+const TIMEOUT_MAX_SAFE = 2 ** 31 - 1;
+const TIMEOUT_MIN_SAFE = 0;
 
 const isWithinRange = (val: number, floor: number, ceiling: number) => val >= floor && val <= ceiling;
 
@@ -26,8 +26,8 @@ export const timeoutMiddleware: Middleware = (ctx, next) => {
     throw new TypeError(`The timeout option must be a number`);
   }
 
-  if (!isWithinRange(timeout, MiN_SAFE_TIMEOUT, MAX_SAFE_TIMEOUT)) {
-    const message = `The timeout of ${timeout}ms not to be within range ${MiN_SAFE_TIMEOUT} - ${MAX_SAFE_TIMEOUT}ms`;
+  if (!isWithinRange(timeout, TIMEOUT_MIN_SAFE, TIMEOUT_MAX_SAFE)) {
+    const message = `The timeout of ${timeout}ms not to be within range ${TIMEOUT_MIN_SAFE} - ${TIMEOUT_MAX_SAFE}ms`;
     throw new RangeError(message);
   }
 
@@ -36,8 +36,8 @@ export const timeoutMiddleware: Middleware = (ctx, next) => {
 
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
-      reject(new Exception(`The timeout of ${timeout}ms exceeded.`, Exception.TIMEOUT_ERROR, ctx));
       controller.abort();
+      reject(new Exception(`The timeout of ${timeout}ms exceeded.`, Exception.TIMEOUT_ERROR, ctx));
     }, timeout);
 
     next()
