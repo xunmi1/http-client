@@ -8,7 +8,7 @@ export abstract class Model<C = any> {
   protected abstract readonly coreMiddleware: Middleware<C>;
 
   use(middleware: Middleware<C>) {
-    if (!isFunction(middleware)) throw new TypeError('middleware must be a function!');
+    if (!isFunction(middleware)) throw new TypeError('middleware must be a function');
     this.middlewareStack.push(middleware);
     return this;
   }

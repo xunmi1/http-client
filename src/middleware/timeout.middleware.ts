@@ -23,7 +23,7 @@ export const timeoutMiddleware: Middleware = (ctx, next) => {
   const timeout = ctx.request.timeout;
   if (timeout == null) return next();
   if (!isNumber(timeout)) {
-    throw new TypeError(`The timeout option must be a number`);
+    throw new TypeError('The timeout option must be a number');
   }
 
   if (!isWithinRange(timeout, TIMEOUT_MIN_SAFE, TIMEOUT_MAX_SAFE)) {
@@ -37,7 +37,7 @@ export const timeoutMiddleware: Middleware = (ctx, next) => {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
       controller.abort();
-      reject(new Exception(`The timeout of ${timeout}ms exceeded.`, Exception.TIMEOUT_ERROR, ctx));
+      reject(new Exception(`The timeout of ${timeout}ms exceeded`, Exception.TIMEOUT_ERROR, ctx));
     }, timeout);
 
     next()
