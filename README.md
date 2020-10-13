@@ -4,6 +4,7 @@
 [![codecov](https://img.shields.io/codecov/c/github/xunmi1/http-client?style=flat-square&logo=codecov)](https://codecov.io/gh/xunmi1/http-client)
 [![npm bundle size](https://img.shields.io/bundlephobia/minzip/@xunmi/http-client?style=flat-square)](https://www.npmjs.com/package/@xunmi/http-client)
 [![npm version](https://img.shields.io/npm/v/@xunmi/http-client?&style=flat-square&logo=npm)](https://www.npmjs.com/package/@xunmi/http-client)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fxunmi1%2Fhttp-client.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fxunmi1%2Fhttp-client?ref=badge_shield)
 
 An HTTP client based on the [Fetch API](https://developer.mozilla.org/docs/Web/API/Fetch_API).
 
@@ -297,3 +298,7 @@ httpClient.get('resource', { signal: controller.signal }).catch(error => {
   }
 });
 ```
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fxunmi1%2Fhttp-client.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fxunmi1%2Fhttp-client?ref=badge_large)
