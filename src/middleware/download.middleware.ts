@@ -31,7 +31,7 @@ const rendStreamNode = (response: { body?: any }, notice: DownloadProgressEvent<
   /* istanbul ignore if */
   if (!readableStream?.readable) return;
   let loaded = 0;
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     readableStream.on('readable', () => {
       let value: Buffer;
       while ((value = readableStream.read())) {
@@ -40,7 +40,7 @@ const rendStreamNode = (response: { body?: any }, notice: DownloadProgressEvent<
       }
     });
     readableStream.on('end', () => {
-      notice({ total: loaded, loaded, value: undefined, done: true });
+      notice({ total: loaded, loaded, done: true });
       resolve();
     });
     readableStream.on('close', resolve);
