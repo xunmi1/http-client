@@ -1,18 +1,24 @@
-import { RequestOptions } from './interfaces';
+import { RequestOptions, RequestParams } from './interfaces';
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
-export const hasOwn = (val: object, key: string | symbol): key is keyof typeof val => hasOwnProperty.call(val, key);
+export const hasOwn = (val: Record<any, any>, key: string | symbol): key is keyof typeof val =>
+  hasOwnProperty.call(val, key);
 
 const objectToString = Object.prototype.toString;
 export const toRawType = (val: unknown): string => objectToString.call(val).slice(8, -1);
 
-const isPlainObject = (val: unknown): val is Record<any, any> => toRawType(val) === 'Object';
-export const isPlainJSON = (val: unknown): val is Record<any, any> | any[] => isPlainObject(val) || isArray(val);
-
 export const isNumber = (val: unknown): val is number => typeof val === 'number';
 export const isFunction = (val: unknown): val is Function => typeof val === 'function';
 export const isArray = Array.isArray;
-export const isObject = (val: unknown): val is object => val !== null && typeof val === 'object';
+export const isObject = (val: unknown): val is Record<any, any> => val !== null && typeof val === 'object';
+
+type PlainValue = string | number | boolean | BigInt | null | undefined | PlainJSON;
+export type PlainArray = PlainValue[];
+export type PlainObject = { [key: string]: PlainValue };
+export type PlainJSON = PlainObject | PlainArray;
+
+const isPlainObject = (val: unknown): val is object => toRawType(val) === 'Object';
+export const isPlainJSON = (val: unknown): val is PlainJSON => isPlainObject(val) || isArray(val);
 
 export const setIfNull = (target: Headers | URLSearchParams, key: string, value: string) => {
   if (!target.has(key)) target.append(key, value);
@@ -30,9 +36,8 @@ export const mergeOptions = (val1: RequestOptions, val2: RequestOptions = {}): R
 };
 
 type RequestHeaders = RequestOptions['headers'];
-type RequestParams = RequestOptions['params'];
 
-const mergeHeaders = (val1: RequestHeaders, val2: RequestHeaders) => {
+const mergeHeaders = (val1: RequestHeaders, val2: RequestHeaders): Headers => {
   const source = new Headers(val1);
   const result = new Headers(val2);
   // For options, directly overwrite, and not append
@@ -40,20 +45,20 @@ const mergeHeaders = (val1: RequestHeaders, val2: RequestHeaders) => {
   return result;
 };
 
-const mergeParams = (val1: RequestParams, val2: RequestParams) => {
+const mergeParams = (val1: RequestParams, val2: RequestParams): URLSearchParams => {
   const source = createSearchParams(val1);
   const result = createSearchParams(val2);
   source.forEach((v, k) => setIfNull(result, k, v));
   return result;
 };
 
-const createSearchParams = (val: RequestParams): URLSearchParams => {
+export const createSearchParams = (val: RequestParams): URLSearchParams => {
   if (isPlainObject(val)) {
     const searchParams = new URLSearchParams();
     Object.keys(val).forEach(k => flatParams(searchParams, k, val[k]));
     return searchParams;
   }
-  // val is any[][] | string | URLSearchParams
+  // val is string[][] | string | URLSearchParams
   return new URLSearchParams(val);
 };
 
@@ -71,7 +76,9 @@ const flatParams = (searchParams: URLSearchParams, key: string, val: any): void 
   searchParams.append(key, val);
 };
 
-export const deepMerge = <T1 = any, T2 = any>(target: T1, source: T2): T1 & T2 => {
+export type Merge<T1, T2> = Omit<T1, Extract<keyof T1, keyof T2>> & T2;
+
+export const deepMerge = <T1 = any, T2 = any>(target: T1, source: T2): Merge<T1, T2> => {
   if (toRawType(target) === toRawType(source) && isObject(source)) {
     Object.keys(target).forEach(key => {
       const value = target[key];
@@ -79,9 +86,18 @@ export const deepMerge = <T1 = any, T2 = any>(target: T1, source: T2): T1 & T2 =
     });
   }
 
-  return source as T1 & T2;
+  return source as Merge<T1, T2>;
 };
 
-export const promisify = <T extends (...args: any[]) => any>(fn: T) => (
+export const asyncify = <T extends (...args: any[]) => any>(fn: T) => (
   ...args: Parameters<T>
 ): Promise<ReturnType<T>> => Promise.resolve().then(() => fn(...args));
+
+export const parseJSON = (text: string): any => {
+  if (text === '') return text;
+  try {
+    return text && JSON.parse(text);
+  } catch {
+    return text;
+  }
+};

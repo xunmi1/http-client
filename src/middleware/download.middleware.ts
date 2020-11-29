@@ -1,7 +1,7 @@
 import { Middleware, DownloadProgressEvent } from '../interfaces';
-import { toRawType, isFunction, promisify } from '../utils';
+import { toRawType, isFunction, asyncify } from '../utils';
 
-const isNodeEnv = typeof process !== 'undefined' && toRawType(process) === 'process';
+const isNode = typeof process !== 'undefined' && toRawType(process) === 'process';
 
 const CONTENT_LENGTH = 'content-length';
 
@@ -58,10 +58,10 @@ export const downloadMiddleware: Middleware = (ctx, next) => {
     throw new TypeError('The onDownloadProgress option must be a function');
   }
   // Avoid blocking the current queue
-  const noticeAsync = promisify(notice);
+  const noticeAsync = asyncify(notice);
 
   return next().then(() => {
     const response = ctx.response!.clone();
-    return (isNodeEnv ? rendStreamNode : /* istanbul ignore next */ rendStreamBrowser)(response, noticeAsync);
+    return (isNode ? rendStreamNode : /* istanbul ignore next */ rendStreamBrowser)(response, noticeAsync);
   });
 };

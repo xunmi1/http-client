@@ -98,11 +98,11 @@ interface RequestOptions extends RequestInit {
   // The data to be sent as the request body.
   // It will be serialized automatically when is a plain object.
   // When using the `body` option at the same time, use `body` first.
-  data?: Record<string | number, any> | any[] | BodyInit;
+  data?: Record<string, any> | any[] | BodyInit;
 
   // The URL parameters to be sent with the request.
   // It will append when `url` contains parameters.
-  params?: Record<string | number, any> | any[][] | string | URLSearchParams;
+  params?: Record<string, any> | any[][] | string | URLSearchParams;
 
   // The number of milliseconds a request can take before automatically being terminated.
   // The default is `undefined` (no timeout).

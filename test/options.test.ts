@@ -73,53 +73,6 @@ describe('headers', () => {
   });
 });
 
-describe('params', () => {
-  const startQueryServer = (url: string) => {
-    scope
-      .get(url)
-      .query(true)
-      .reply(200, (v: string) => v.slice(url.length));
-  };
-
-  test('type of params is URLSearchParams', () => {
-    // @ts-ignore
-    expect(new HttpClient().defaults.params).toBeInstanceOf(URLSearchParams);
-  });
-
-  test('merge default params and request params', async () => {
-    const params = { x: 1, y: [1, { z: { z1: 1 } }, null, undefined] };
-    const http = new HttpClient({ baseURL, params });
-    // @ts-ignore
-    const defaultParams = http.defaults.params as URLSearchParams;
-    expect(defaultParams.getAll('x')).toEqual(['1']);
-    expect(defaultParams.getAll('y')).toEqual(['1', '']);
-    expect(defaultParams.getAll('y[z]')).toEqual([]);
-    expect(defaultParams.getAll('y[z][z1]')).toEqual(['1']);
-
-    const url = '/params/default-request';
-    startQueryServer(url);
-    const { data } = await http.get(url, { params: { x: 2, y: [2, { z: 2 }] }, responseType: 'text' });
-    const receivedParams = new URLSearchParams(data);
-    expect(receivedParams.getAll('x')).toEqual(['2']);
-    expect(receivedParams.getAll('y')).toEqual(['2']);
-    expect(receivedParams.getAll('y[z]')).toEqual(['2']);
-    expect(receivedParams.getAll('y[z][z1]')).toEqual(['1']);
-  });
-
-  test('merge request params and url params', async () => {
-    const http = new HttpClient({ baseURL });
-    const url = '/params/request-url';
-    const urlWithParams = `${url}?x=1&y=1&z=#a`;
-    const params = { x: 2, y: [2, 3] };
-    startQueryServer(url);
-    const { data } = await http.get(urlWithParams, { params, responseType: 'text' });
-    const receivedParams = new URLSearchParams(data);
-    expect(receivedParams.getAll('x')).toEqual(['1', '2']);
-    expect(receivedParams.getAll('y')).toEqual(['1', '2', '3']);
-    expect(receivedParams.getAll('z')).toEqual(['']);
-  });
-});
-
 describe('data', () => {
   const startBodyServer = (url: string) => {
     scope.post(url).reply(200, (_, body) => body);
@@ -205,10 +158,10 @@ describe('timeout', () => {
     }
   });
 
-  test('early abort request with timeout', async () => {
+  test('abort request before timeout', async () => {
     const controller = new AbortController();
     const http = new HttpClient({ baseURL });
-    const url = '/timeout/abort';
+    const url = '/timeout/early-abort';
     scope.get(url).delayConnection(40).reply(200);
     expect.hasAssertions();
     try {
@@ -217,6 +170,21 @@ describe('timeout', () => {
     } catch (err) {
       expect(err).toBeInstanceOf(Exception);
       expect(err.name).toBe(Exception.ABORT_ERROR);
+    }
+  });
+
+  test('abort request after timeout', async () => {
+    const controller = new AbortController();
+    const http = new HttpClient({ baseURL });
+    const url = '/timeout/delay-abort';
+    scope.get(url).delayConnection(40).reply(200);
+    expect.hasAssertions();
+    try {
+      setTimeout(() => controller.abort(), 30);
+      await http.get(url, { timeout: 20, signal: controller.signal });
+    } catch (err) {
+      expect(err).toBeInstanceOf(Exception);
+      expect(err.name).toBe(Exception.TIMEOUT_ERROR);
     }
   });
 });

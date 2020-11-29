@@ -1,6 +1,6 @@
 import { Next, Context } from '../interfaces';
 
-export const returnMiddleware = <T>(ctx: Context<T>, next: Next) => {
+export const returnMiddleware = (ctx: Context, next: Next) => {
   return next().then(() => ({
     data: ctx.data!,
     status: ctx.status!,
