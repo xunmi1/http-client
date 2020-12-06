@@ -1,5 +1,5 @@
 import { Middleware } from '../interfaces';
-import { isPlainJSON, setIfNull } from '../utils';
+import { isPlainValue, setIfUndef, stringify } from '../utils';
 
 const composeURL = (params: URLSearchParams, url: string, baseURL?: string): string => {
   const hashIndex = url.indexOf('#');
@@ -15,12 +15,12 @@ export const fetchMiddleware: Middleware = (ctx, next) => {
   const requestURL = composeURL(params, url, baseURL);
 
   // default common headers
-  setIfNull(headers, 'Accept', 'application/json, text/plain, */*');
+  setIfUndef(headers, 'Accept', 'application/json, text/plain, */*');
 
   if (request.body == null && data != null) {
-    if (isPlainJSON(data)) {
-      setIfNull(headers, 'Content-Type', 'application/json;charset=UTF-8');
-      request.body = JSON.stringify(data);
+    if (isPlainValue(data)) {
+      setIfUndef(headers, 'Content-Type', 'application/json;charset=UTF-8');
+      request.body = stringify(data);
     } else {
       request.body = data;
     }

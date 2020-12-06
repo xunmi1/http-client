@@ -1,4 +1,4 @@
-import HttpClient from '../src';
+import HttpClient, { HttpClientOptions, Next, DownloadProgressEvent } from '../src';
 import nock from 'nock';
 
 const Exception = HttpClient.Exception;
@@ -36,7 +36,7 @@ describe('url', () => {
 });
 
 describe('method', () => {
-  test('type of method is string', () => {
+  test('default is `GET`', () => {
     // @ts-ignore
     expect(new HttpClient().defaults.method).toBe('GET');
   });
@@ -64,7 +64,7 @@ describe('headers', () => {
   test('merge default headers and request headers', async () => {
     const url = '/headers/default-request';
     scope.get(url).reply(200);
-    const mockMiddleware = jest.fn((ctx: any, next: any) => next());
+    const mockMiddleware = jest.fn((_, next: Next) => next());
     const http = new HttpClient({ baseURL, headers: { x: '1', y: '1' } }).use(mockMiddleware);
     await http.get(url, { headers: { x: '2' } });
     const headers: Headers = mockMiddleware.mock.calls[0][0].request.headers;
@@ -73,28 +73,44 @@ describe('headers', () => {
   });
 });
 
-describe('data', () => {
-  const startBodyServer = (url: string) => {
-    scope.post(url).reply(200, (_, body) => body);
-  };
+const startBodyServer = (url: string) => {
+  scope.post(url).reply(200, (_, body) => body);
+};
 
-  test('merge default data and request data', async () => {
-    const defaultData = { x: 1, y: [1, { z: { z1: 1 } }], z: 1 };
-    const http = new HttpClient({ baseURL, data: defaultData });
-    const url = '/data/default-request';
+describe('data', () => {
+  test('object type', async () => {
+    const http = new HttpClient({ baseURL });
+    const url = '/data/merge-object';
     startBodyServer(url);
-    const { data } = await http.post(url, { data: { x: 2, y: [2, { z: undefined }] } });
-    expect(data).toEqual({ x: 2, y: [2, { z: undefined }], z: 1 });
+    const data = { x: 2, z: [2, { z: null }] };
+    const req = await http.post(url, { data });
+    expect(req.data).toStrictEqual(data);
+  });
+
+  test('primitive type', async () => {
+    const http = new HttpClient({ baseURL });
+    const url = '/data/merge-primitive';
+    startBodyServer(url);
+    const { data } = await http.post(url, { data: 1 });
+    expect(data).toBe(1);
+  });
+
+  test('support BigInt type', async () => {
+    const http = new HttpClient({ baseURL });
+    const url = '/data/bigint';
+    const max = BigInt(Number.MAX_VALUE);
+    startBodyServer(url);
+    const { data } = await http.post(url, { data: { a: max } });
+    expect(data).toEqual({ a: max.toString() });
   });
 
   test('use body first', async () => {
     const http = new HttpClient({ baseURL });
     const url = '/data/request-body';
-    const requestData = { x: 'requestData' };
-    const requestBody = JSON.stringify({ x: 'requestBody' });
+    const body = { x: 'requestBody' };
     startBodyServer(url);
-    const { data } = await http.post(url, { body: requestBody, data: requestData });
-    expect(data).toEqual(JSON.parse(requestBody));
+    const { data } = await http.post(url, { body: JSON.stringify({ x: 'requestBody' }), data: { x: 'requestData' } });
+    expect(data).toEqual(body);
   });
 
   test('type of data is not JSON', async () => {
@@ -104,88 +120,19 @@ describe('data', () => {
     const { data } = await http.post(url, { data: requestData, responseType: 'arrayBuffer' });
     expect(data.byteLength).toBe(requestData.byteLength);
   });
-});
 
-describe('timeout', () => {
-  test('merge timeout option', async () => {
-    const defaultTimeout = 10000;
-    const http = new HttpClient({ baseURL, timeout: defaultTimeout });
-    // @ts-ignore
-    expect(http.defaults.timeout).toBe(defaultTimeout);
+  test('ignore default `data` option', async () => {
+    const defaultData = { x: 1, y: 1 };
+    const http = new HttpClient({ baseURL, data: defaultData } as HttpClientOptions);
+    const url = '/data/default-data';
+    startBodyServer(url);
+    let req = await http.post(url);
+    expect(req.data).toBe('');
 
-    const mockMiddleware = jest.fn((ctx: any, next: any) => next());
-    http.use(mockMiddleware);
-    const [timeout, url] = [15000, '/timeout/merge'];
-    scope.get(url).reply(200);
-    await http.get(url, { timeout });
-    const ctx = mockMiddleware.mock.calls[0][0];
-    expect(ctx.request.timeout).toBe(timeout);
-  });
-
-  test('timeout must be a number', async () => {
-    const http = new HttpClient({ baseURL });
-    expect.hasAssertions();
-    try {
-      // @ts-ignore
-      await http.get('timeout/number', { timeout: '' });
-    } catch (err) {
-      expect(err).toBeInstanceOf(Exception);
-      expect(err.name).toBe('TypeError');
-    }
-  });
-
-  test('timeout must be within a safe value range', async () => {
-    const http = new HttpClient({ baseURL });
-    expect.hasAssertions();
-    try {
-      await http.get('timeout/unsafe', { timeout: -1 });
-    } catch (err) {
-      expect(err).toBeInstanceOf(Exception);
-      expect(err.name).toBe('RangeError');
-    }
-  });
-
-  test('timed out', async () => {
-    const http = new HttpClient({ baseURL });
-    const url = '/timeout/timed';
-    scope.get(url).delayConnection(40).reply(200);
-    expect.hasAssertions();
-    try {
-      await http.get(url, { timeout: 20 });
-    } catch (err) {
-      expect(err).toBeInstanceOf(Exception);
-      expect(err.name).toBe(Exception.TIMEOUT_ERROR);
-    }
-  });
-
-  test('abort request before timeout', async () => {
-    const controller = new AbortController();
-    const http = new HttpClient({ baseURL });
-    const url = '/timeout/early-abort';
-    scope.get(url).delayConnection(40).reply(200);
-    expect.hasAssertions();
-    try {
-      setTimeout(() => controller.abort(), 20);
-      await http.get(url, { timeout: 30, signal: controller.signal });
-    } catch (err) {
-      expect(err).toBeInstanceOf(Exception);
-      expect(err.name).toBe(Exception.ABORT_ERROR);
-    }
-  });
-
-  test('abort request after timeout', async () => {
-    const controller = new AbortController();
-    const http = new HttpClient({ baseURL });
-    const url = '/timeout/delay-abort';
-    scope.get(url).delayConnection(40).reply(200);
-    expect.hasAssertions();
-    try {
-      setTimeout(() => controller.abort(), 30);
-      await http.get(url, { timeout: 20, signal: controller.signal });
-    } catch (err) {
-      expect(err).toBeInstanceOf(Exception);
-      expect(err.name).toBe(Exception.TIMEOUT_ERROR);
-    }
+    startBodyServer(url);
+    const data = { x: 2 };
+    req = await http.post(url, { data });
+    expect(req.data).toStrictEqual(data);
   });
 });
 
@@ -194,8 +141,7 @@ describe('onDownloadProgress', () => {
     const http = new HttpClient({ baseURL });
     expect.hasAssertions();
     try {
-      // @ts-ignore
-      await http.get('download-progress/function', { onDownloadProgress: -1 });
+      await http.get('download-progress/function', { onDownloadProgress: (-1 as any) as DownloadProgressEvent });
     } catch (err) {
       expect(err).toBeInstanceOf(Exception);
       expect(err.name).toBe('TypeError');

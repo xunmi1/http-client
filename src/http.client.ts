@@ -10,7 +10,7 @@ import {
   returnMiddleware,
   exceptionMiddleware,
 } from './middleware';
-import { RequestOptions } from './interfaces';
+import { HttpClientOptions, RequestOptions } from './interfaces';
 import { mergeOptions } from './utils';
 
 export type RequestMethod = HttpClient['request'];
@@ -24,7 +24,7 @@ const coreMiddleware = Model.compose([
   fetchMiddleware,
 ]);
 
-const initOptions: RequestOptions = {
+const initOptions: HttpClientOptions = {
   method: 'GET',
   responseType: 'json',
   // The default value of `credentials` of some old browsers is not `same-origin`,
@@ -39,7 +39,7 @@ export class HttpClient extends Model<Context> {
   static readonly Context = Context;
   static readonly mergeOptions = mergeOptions;
 
-  protected readonly defaults: RequestOptions;
+  protected readonly defaults: HttpClientOptions;
   protected readonly coreMiddleware = coreMiddleware;
 
   get: RequestMethod;
@@ -50,7 +50,7 @@ export class HttpClient extends Model<Context> {
   head: RequestMethod;
   options: RequestMethod;
 
-  constructor(options?: RequestOptions) {
+  constructor(options?: HttpClientOptions) {
     super();
     this.defaults = HttpClient.mergeOptions(initOptions, options);
 

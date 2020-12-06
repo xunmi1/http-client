@@ -35,6 +35,20 @@ describe('type of params', () => {
     expect(received.getAll('g')).toEqual(['1', '2']);
   });
 
+  test('two-dimensional array', async () => {
+    const params = [
+      ['a', '1'],
+      ['a', '2'],
+      ['b', ''],
+    ];
+    const url = '/two-dimensional-array';
+    startQueryServer(url);
+    const { data } = await http.get(url, { params });
+    const received = new URLSearchParams(data);
+    expect(received.getAll('a')).toEqual(['1', '2']);
+    expect(received.getAll('b')).toEqual(['']);
+  });
+
   test('URLSearchParams', async () => {
     const params = new URLSearchParams([
       ['a', '1'],

@@ -1,5 +1,5 @@
 import type { Context } from './context';
-import type { PlainJSON, PlainObject } from './utils';
+import type { PlainValue, PlainObject } from './utils';
 
 export type { Context };
 
@@ -11,7 +11,7 @@ type AsyncFunction = (...args: any[]) => Promise<unknown>;
 type AsyncReturnType<T extends AsyncFunction> = ReturnType<T> extends Promise<infer R> ? R : any;
 
 export type RequestParams = PlainObject | ConstructorParameters<typeof URLSearchParams>[0];
-export type RequestData = PlainJSON | BodyInit;
+export type RequestData = PlainValue | BodyInit;
 
 export type ResponseType = PickKeys<Body, AsyncFunction>;
 export type ResponseData<T> = T extends ResponseType ? AsyncReturnType<Body[T]> : any;
@@ -20,13 +20,16 @@ export interface DownloadProgressEvent<T = Uint8Array> {
   (event: { total: number; loaded: number; done: boolean; value?: T }): void;
 }
 
-export interface RequestOptions extends RequestInit {
+export interface HttpClientOptions extends RequestInit {
   baseURL?: string;
   responseType?: ResponseType;
-  data?: RequestData;
   params?: RequestParams;
   timeout?: number;
   onDownloadProgress?: DownloadProgressEvent;
+}
+
+export interface RequestOptions extends HttpClientOptions {
+  data?: RequestData;
   // Convenient for users to expand the configuration
   [key: string]: any;
 }

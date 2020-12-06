@@ -1,4 +1,4 @@
-import HttpClient from '../src';
+import HttpClient, { Next } from '../src';
 import nock from 'nock';
 
 import { version } from '../package.json';
@@ -75,15 +75,13 @@ describe('middleware', () => {
   test('middleware must be a function', () => {
     // @ts-ignore
     expect(() => new HttpClient().use('')).toThrow(TypeError);
-    // @ts-ignore
-    expect(() => HttpClient.use('')).toThrow(TypeError);
   });
 
   test('use middleware', async () => {
     const url = '/middleware/instance';
     scope.get(url).times(2).reply(200);
 
-    const mockMiddleware = jest.fn((ctx: any, next: any) => next());
+    const mockMiddleware = jest.fn((_, next: Next) => next());
 
     const http1 = new HttpClient({ baseURL }).use(mockMiddleware);
     const http2 = new HttpClient({ baseURL });
@@ -94,7 +92,7 @@ describe('middleware', () => {
     expect(mockMiddleware).toBeCalledWith(expect.any(HttpClient.Context), expect.any(Function));
   });
 
-  test('next() can only be called once in one middleware', async () => {
+  test('`next()` can only be called once in one middleware', async () => {
     const url = '/middleware/next';
     scope.get(url).reply(200);
     const http = new HttpClient({ baseURL });
@@ -102,7 +100,7 @@ describe('middleware', () => {
       await next();
       await next();
     });
-    await expect(() => http.get(url)).rejects.toThrow(Error);
+    await expect(http.get(url)).rejects.toThrow(Error);
   });
 });
 
