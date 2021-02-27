@@ -5,6 +5,7 @@
     "module": "ESNext",
     "strict": true,
     "noUnusedLocals": true,
+    "noImplicitAny": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "esModuleInterop": true,

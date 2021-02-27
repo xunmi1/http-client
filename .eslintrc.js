@@ -8,8 +8,6 @@ module.exports = {
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
-    // Uses `eslint-config-prettier` to disable ESLint rules from `@typescript-eslint/eslint-plugin`
-    'prettier/@typescript-eslint',
     // Must always be last
     'plugin:prettier/recommended',
   ],

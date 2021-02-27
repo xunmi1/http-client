@@ -8,13 +8,13 @@ export const isBigInt = (val: unknown): val is BigInt => typeof val === 'bigint'
 export const isUndefined = (val: unknown): val is undefined => val === undefined;
 export const isFunction = (val: unknown): val is Function => typeof val === 'function';
 export const isArray = Array.isArray;
-export const isObject = (val: unknown): val is Record<any, any> => val !== null && typeof val === 'object';
+export const isObject = (val: unknown): val is object => val !== null && typeof val === 'object';
 
 export type PlainValue = string | number | boolean | BigInt | null | undefined | PlainObject | PlainArray;
 export type PlainArray = PlainValue[];
 export type PlainObject = { [key: string]: PlainValue };
 
-const isPlainObject = (val: unknown): val is object => toRawType(val) === 'Object';
+const isPlainObject = (val: unknown): val is Record<any, any> => toRawType(val) === 'Object';
 export const isPlainValue = (val: unknown): val is PlainValue => !isObject(val) || isPlainObject(val) || isArray(val);
 
 export const setIfUndef = (target: Headers | URLSearchParams, key: string, value: string) => {
