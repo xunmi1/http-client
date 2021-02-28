@@ -3,7 +3,7 @@ import { Exception } from '../exception';
 import { isFunction, parse } from '../utils';
 
 const parseResponse = <T extends ResponseType>(response: Response, type: T): Promise<ResponseData<T>> => {
-  if (type === 'json') return response.text().then(parse);
+  if (type === 'json') return response.text().then(parse as ResponseData<'json'>);
   return response[type]();
 };
 

@@ -5,7 +5,6 @@ export const toRawType = (val: unknown): string => objectToString.call(val).slic
 
 export const isNumber = (val: unknown): val is number => typeof val === 'number';
 export const isBigInt = (val: unknown): val is BigInt => typeof val === 'bigint';
-export const isUndefined = (val: unknown): val is undefined => val === undefined;
 export const isFunction = (val: unknown): val is Function => typeof val === 'function';
 export const isArray = Array.isArray;
 export const isObject = (val: unknown): val is object => val !== null && typeof val === 'object';
@@ -26,11 +25,8 @@ export const mergeOptions = <T extends RequestOptions>(val1: T, val2: Partial<T>
   merged.headers = mergeHeaders(val1.headers, val2.headers);
   merged.params = mergeParams(val1.params, val2.params);
   merged.method = merged.method?.toUpperCase();
-  if ('data' in merged) {
-    // ignore first `data` option
-    if (isUndefined(val2.data)) delete merged.data;
-    else merged.data = val2.data;
-  }
+  // ignore first `data` option
+  merged.data = val2.data;
   return merged;
 };
 
@@ -79,7 +75,7 @@ export const asyncify = <T extends (...args: any[]) => any>(fn: T) => (
   ...args: Parameters<T>
 ): Promise<ReturnType<T>> => Promise.resolve().then(() => fn(...args));
 
-export const parse = (text: string): any => {
+export const parse = (text: string): PlainValue => {
   if (!text || text === '') return text;
   try {
     return text && JSON.parse(text);
