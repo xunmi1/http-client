@@ -54,13 +54,13 @@ export class HttpClient extends Model<Context> {
     super();
     this.defaults = HttpClient.mergeOptions(initOptions, options);
 
-    const methods = ['get', 'post', 'delete', 'put', 'patch', 'head', 'options'];
+    const methods = ['get', 'post', 'delete', 'put', 'patch', 'head', 'options'] as const;
     methods.forEach(method => {
       this[method] = (url: string, options?: RequestOptions) => this.request(url, { ...options, method });
     });
   }
 
-  request(url: string, options?: RequestOptions): Promise<any> {
+  request<T = any>(url: string, options?: RequestOptions): Promise<T> {
     const merged = HttpClient.mergeOptions(this.defaults, options);
     const ctx = new HttpClient.Context(url, merged);
     return this.compose()(ctx);
