@@ -4,12 +4,12 @@ const objectToString = Object.prototype.toString;
 export const toRawType = (val: unknown): string => objectToString.call(val).slice(8, -1);
 
 export const isNumber = (val: unknown): val is number => typeof val === 'number';
-export const isBigInt = (val: unknown): val is BigInt => typeof val === 'bigint';
+export const isBigInt = (val: unknown): val is bigint => typeof val === 'bigint';
 export const isFunction = (val: unknown): val is Function => typeof val === 'function';
 export const isArray = Array.isArray;
 export const isObject = (val: unknown): val is object => val !== null && typeof val === 'object';
 
-export type PlainValue = string | number | boolean | BigInt | null | undefined | PlainObject | PlainArray;
+export type PlainValue = string | number | boolean | bigint | null | undefined | PlainObject | PlainArray;
 export type PlainArray = PlainValue[];
 export type PlainObject = { [key: string]: PlainValue };
 
@@ -84,5 +84,5 @@ export const parse = (text: string): PlainValue => {
   }
 };
 
-// JSON.stringify: support `BigInt` type
+// JSON.stringify: support `bigint` type
 export const stringify = (val: PlainValue): string => JSON.stringify(val, (_, v) => (isBigInt(v) ? v.toString() : v));

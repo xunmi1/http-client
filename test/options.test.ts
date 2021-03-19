@@ -95,7 +95,7 @@ describe('data', () => {
     expect(data).toBe(1);
   });
 
-  test('support BigInt type', async () => {
+  test('support bigint type', async () => {
     const http = new HttpClient({ baseURL });
     const url = '/data/bigint';
     const max = BigInt(Number.MAX_VALUE);
