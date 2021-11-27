@@ -9,11 +9,24 @@ import {
   timeoutMiddleware,
   returnMiddleware,
   exceptionMiddleware,
+  DefaultReturnValue,
 } from './middleware';
-import { HttpClientOptions, RequestOptions } from './interfaces';
+import { HttpClientOptions, RequestOptions, ResponseData } from './interfaces';
 import { mergeOptions } from './utils';
 
-export type RequestMethod = HttpClient['request'];
+interface Options<T extends RequestOptions['responseType']> extends RequestOptions {
+  responseType: T;
+}
+
+type HttpResult<T> = Promise<DefaultReturnValue<ResponseData<T>>>;
+
+export interface RequestMethod {
+  (url: string, options: Options<'blob'>): HttpResult<'blob'>;
+  (url: string, options: Options<'arrayBuffer'>): HttpResult<'arrayBuffer'>;
+  <T extends string = string>(url: string, options: Options<'text'>): HttpResult<'text'>;
+  <T = unknown>(url: string, options: Options<'json'>): HttpResult<'json'>;
+  <T = unknown>(url: string, options?: RequestOptions): Promise<DefaultReturnValue<T>>;
+}
 
 const coreMiddleware = Model.compose([
   exceptionMiddleware,
@@ -23,6 +36,8 @@ const coreMiddleware = Model.compose([
   downloadMiddleware,
   fetchMiddleware,
 ]);
+
+const methods = ['get', 'post', 'delete', 'put', 'patch', 'head', 'options'] as const;
 
 const initOptions: HttpClientOptions = {
   method: 'GET',
@@ -54,7 +69,6 @@ export class HttpClient extends Model<Context> {
     super();
     this.defaults = HttpClient.mergeOptions(initOptions, options);
 
-    const methods = ['get', 'post', 'delete', 'put', 'patch', 'head', 'options'] as const;
     methods.forEach(method => {
       this[method] = (url: string, options?: RequestOptions) => this.request(url, { ...options, method });
     });
