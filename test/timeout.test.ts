@@ -29,7 +29,7 @@ describe('timeout option', () => {
       await http.get('/number', { timeout: '' });
     } catch (err) {
       expect(err).toBeInstanceOf(Exception);
-      expect(err.name).toBe('TypeError');
+      expect((err as typeof Exception).name).toBe('TypeError');
     }
   });
 
@@ -40,13 +40,13 @@ describe('timeout option', () => {
     try {
       await http.get('unsafe-lower', { timeout: -1 });
     } catch (err) {
-      expect(err.name).toBe('RangeError');
+      expect((err as Error).name).toBe('RangeError');
     }
 
     try {
       await http.get('unsafe-upper', { timeout: 2 ** 31 });
     } catch (err) {
-      expect(err.name).toBe('RangeError');
+      expect((err as Error).name).toBe('RangeError');
     }
   });
 
@@ -60,7 +60,7 @@ describe('timeout option', () => {
       await http.get(url, { timeout: 20 });
     } catch (err) {
       expect(err).toBeInstanceOf(Exception);
-      expect(err.name).toBe(Exception.TIMEOUT_ERROR);
+      expect((err as typeof Exception).name).toBe(Exception.TIMEOUT_ERROR);
     }
   });
 });
@@ -77,7 +77,7 @@ describe('timeout and abort', () => {
       await http.get(url, { timeout: 30, signal: controller.signal });
     } catch (err) {
       expect(err).toBeInstanceOf(Exception);
-      expect(err.name).toBe(Exception.ABORT_ERROR);
+      expect((err as typeof Exception).name).toBe(Exception.ABORT_ERROR);
     }
   });
 
@@ -92,7 +92,7 @@ describe('timeout and abort', () => {
       await http.get(url, { timeout: 20, signal: controller.signal });
     } catch (err) {
       expect(err).toBeInstanceOf(Exception);
-      expect(err.name).toBe(Exception.TIMEOUT_ERROR);
+      expect((err as typeof Exception).name).toBe(Exception.TIMEOUT_ERROR);
     }
   });
 });

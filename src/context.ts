@@ -14,7 +14,7 @@ export interface ContextResponse<T> extends Response {
   data?: ResponseData<T>;
 }
 
-export class Context<T extends ResponseType = 'json'> {
+export class Context<T extends ResponseType = any> {
   public readonly request: ContextRequest<T>;
   public response?: ContextResponse<T>;
 

@@ -1,4 +1,4 @@
-import HttpClient, { Middleware } from '../src';
+import HttpClient, { Middleware, RequestMethod } from '../src';
 import nock from 'nock';
 
 const Context = HttpClient.Context;
@@ -9,7 +9,10 @@ const contextMiddleware: Middleware = (ctx, next) =>
   next()
     .then(() => ctx)
     .catch(() => ctx);
-const http = new HttpClient({ baseURL }).use(contextMiddleware);
+
+const http = new HttpClient<{ (...args: Parameters<RequestMethod>): ReturnType<typeof contextMiddleware> }>({
+  baseURL,
+}).use(contextMiddleware);
 
 test('create instance', () => {
   expect(new Context('')).toStrictEqual(expect.any(Context));
@@ -30,7 +33,7 @@ test('public field: response', async () => {
   scope.get(url).reply(200);
   const ctx = await http.get(url);
   expect(ctx.response).toBeInstanceOf(Response);
-  expect(ctx.response.data).toBeDefined();
+  expect(ctx.response!.data).toBeDefined();
 });
 
 describe('getter', () => {

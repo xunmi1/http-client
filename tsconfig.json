@@ -11,6 +11,7 @@
     "esModuleInterop": true,
     "strictPropertyInitialization": false,
     "suppressImplicitAnyIndexErrors": true,
+    "skipLibCheck": true,
     "declaration": true,
     "sourceMap": false,
     "baseUrl": "./",

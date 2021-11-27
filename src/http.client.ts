@@ -11,7 +11,7 @@ import {
   exceptionMiddleware,
   DefaultReturnValue,
 } from './middleware';
-import { HttpClientOptions, RequestOptions, ResponseData } from './interfaces';
+import { HttpClientOptions, Middleware, RequestOptions, ResponseData } from './interfaces';
 import { mergeOptions } from './utils';
 
 interface Options<T extends RequestOptions['responseType']> extends RequestOptions {
@@ -21,6 +21,10 @@ interface Options<T extends RequestOptions['responseType']> extends RequestOptio
 type HttpResult<T> = Promise<DefaultReturnValue<ResponseData<T>>>;
 
 export interface RequestMethod {
+  (url: string, options?: RequestOptions): Promise<unknown>;
+}
+
+export interface DefaultRequestMethod {
   (url: string, options: Options<'blob'>): HttpResult<'blob'>;
   (url: string, options: Options<'arrayBuffer'>): HttpResult<'arrayBuffer'>;
   <T extends string = string>(url: string, options: Options<'text'>): HttpResult<'text'>;
@@ -47,7 +51,7 @@ const initOptions: HttpClientOptions = {
   credentials: 'same-origin',
 };
 
-export class HttpClient extends Model<Context> {
+export class HttpClient<R extends RequestMethod = DefaultRequestMethod> extends Model<Context> {
   static readonly version = version;
   static readonly Model = Model;
   static readonly Exception = Exception;
@@ -55,28 +59,28 @@ export class HttpClient extends Model<Context> {
   static readonly mergeOptions = mergeOptions;
 
   protected readonly defaults: HttpClientOptions;
-  protected readonly coreMiddleware = coreMiddleware;
+  protected readonly coreMiddleware: Middleware = coreMiddleware;
 
-  get: RequestMethod;
-  post: RequestMethod;
-  delete: RequestMethod;
-  put: RequestMethod;
-  patch: RequestMethod;
-  head: RequestMethod;
-  options: RequestMethod;
+  get: R;
+  post: R;
+  delete: R;
+  put: R;
+  patch: R;
+  head: R;
+  options: R;
+  request: R;
 
   constructor(options?: HttpClientOptions) {
     super();
     this.defaults = HttpClient.mergeOptions(initOptions, options);
+    this.request = ((url, options) => {
+      const merged = HttpClient.mergeOptions(this.defaults, options);
+      const ctx = new HttpClient.Context(url, merged);
+      return this.compose()(ctx);
+    }) as R;
 
     methods.forEach(method => {
-      this[method] = (url: string, options?: RequestOptions) => this.request(url, { ...options, method });
+      this[method] = ((url, options) => this.request(url, { ...options, method })) as R;
     });
-  }
-
-  request<T = any>(url: string, options?: RequestOptions): Promise<T> {
-    const merged = HttpClient.mergeOptions(this.defaults, options);
-    const ctx = new HttpClient.Context(url, merged);
-    return this.compose()(ctx);
   }
 }

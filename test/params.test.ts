@@ -22,7 +22,7 @@ describe('type of params', () => {
   test('plain object', async () => {
     const params = { a: null, b: 1, c: false, d: '', e: undefined, f: { a: { b: 1 } }, g: [1, 2] };
     startQueryServer('/plain-object');
-    const { data } = await http.get('/plain-object', { params });
+    const { data } = await http.get<string>('/plain-object', { params });
     const received = new URLSearchParams(data);
     expect(received.getAll('a')).toEqual(['']);
     expect(received.getAll('b')).toEqual(['1']);
@@ -43,7 +43,7 @@ describe('type of params', () => {
     ];
     const url = '/two-dimensional-array';
     startQueryServer(url);
-    const { data } = await http.get(url, { params });
+    const { data } = await http.get<string>(url, { params });
     const received = new URLSearchParams(data);
     expect(received.getAll('a')).toEqual(['1', '2']);
     expect(received.getAll('b')).toEqual(['']);
@@ -57,7 +57,7 @@ describe('type of params', () => {
     ]);
     const url = '/url-search-params';
     startQueryServer(url);
-    const { data } = await http.get(url, { params });
+    const { data } = await http.get<string>(url, { params });
     const received = new URLSearchParams(data);
     expect(received.getAll('a')).toEqual(['1', '2']);
     expect(received.getAll('b')).toEqual(['']);

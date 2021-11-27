@@ -144,7 +144,7 @@ describe('onDownloadProgress', () => {
       await http.get('download-progress/function', { onDownloadProgress: (-1 as any) as DownloadProgressEvent });
     } catch (err) {
       expect(err).toBeInstanceOf(Exception);
-      expect(err.name).toBe('TypeError');
+      expect((err as typeof Exception).name).toBe('TypeError');
     }
   });
 

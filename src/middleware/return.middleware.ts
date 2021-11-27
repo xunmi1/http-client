@@ -1,4 +1,4 @@
-import { Next, Context } from '../interfaces';
+import { Middleware } from '../interfaces';
 
 export interface DefaultReturnValue<T> {
   data: T;
@@ -7,7 +7,7 @@ export interface DefaultReturnValue<T> {
   headers: Headers;
 }
 
-export const returnMiddleware = (ctx: Context, next: Next): Promise<DefaultReturnValue<unknown>> => {
+export const returnMiddleware: Middleware = (ctx, next): Promise<DefaultReturnValue<unknown>> => {
   return next().then(() => ({
     data: ctx.data!,
     status: ctx.status!,
