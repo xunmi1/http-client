@@ -141,7 +141,7 @@ describe('onDownloadProgress', () => {
     const http = new HttpClient({ baseURL });
     expect.hasAssertions();
     try {
-      await http.get('download-progress/function', { onDownloadProgress: (-1 as any) as DownloadProgressEvent });
+      await http.get('download-progress/function', { onDownloadProgress: -1 as any as DownloadProgressEvent });
     } catch (err) {
       expect(err).toBeInstanceOf(Exception);
       expect((err as typeof Exception).name).toBe('TypeError');

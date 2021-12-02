@@ -71,9 +71,10 @@ const flatParams = (searchParams: URLSearchParams, key: string, val: any): void 
   searchParams.append(key, val);
 };
 
-export const asyncify = <T extends (...args: any[]) => any>(fn: T) => (
-  ...args: Parameters<T>
-): Promise<ReturnType<T>> => Promise.resolve().then(() => fn(...args));
+export const asyncify =
+  <T extends (...args: any[]) => any>(fn: T) =>
+  (...args: Parameters<T>): Promise<ReturnType<T>> =>
+    Promise.resolve().then(() => fn(...args));
 
 export const parse = (text: string): PlainValue => {
   if (!text || text === '') return text;
