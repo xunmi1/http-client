@@ -9,27 +9,25 @@ import {
   timeoutMiddleware,
   returnMiddleware,
   exceptionMiddleware,
-  DefaultReturnValue,
+  type DefaultReturnValue,
 } from './middleware';
-import { HttpClientOptions, Middleware, RequestOptions, ResponseData } from './interfaces';
+import { HttpClientOptions, Middleware, RequestOptions, ResponseType, ResponseData } from './interfaces';
 import { mergeOptions } from './utils';
 
-interface Options<T extends RequestOptions['responseType']> extends RequestOptions {
-  responseType: T;
-}
+type Options<T extends ResponseType> = Omit<RequestOptions, 'responseType'> & { responseType: T };
 
-type HttpResult<T> = Promise<DefaultReturnValue<ResponseData<T>>>;
+type HttpResult<T, Type> = Promise<DefaultReturnValue<T extends ResponseData<Type> ? T : unknown>>;
 
 export interface RequestMethod {
   (url: string, options?: RequestOptions): Promise<unknown>;
 }
 
 export interface DefaultRequestMethod {
-  (url: string, options: Options<'blob'>): HttpResult<'blob'>;
-  (url: string, options: Options<'arrayBuffer'>): HttpResult<'arrayBuffer'>;
-  <T extends string = string>(url: string, options: Options<'text'>): HttpResult<'text'>;
-  <T = unknown>(url: string, options: Options<'json'>): HttpResult<'json'>;
-  <T = unknown>(url: string, options?: RequestOptions): Promise<DefaultReturnValue<T>>;
+  <T = Blob>(url: string, options: Options<'blob'>): HttpResult<T, 'blob'>;
+  <T = ArrayBuffer>(url: string, options: Options<'arrayBuffer'>): HttpResult<T, 'arrayBuffer'>;
+  <T = FormData>(url: string, options: Options<'formData'>): HttpResult<T, 'formData'>;
+  <T = string>(url: string, options: Options<'text'>): HttpResult<T, 'text'>;
+  <T = unknown>(url: string, options?: RequestOptions): HttpResult<T, 'json'>;
 }
 
 const coreMiddleware = Model.compose([
