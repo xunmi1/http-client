@@ -85,5 +85,4 @@ export const parse = (text: string): PlainValue => {
   }
 };
 
-// JSON.stringify: support `bigint` type
-export const stringify = (val: PlainValue): string => JSON.stringify(val, (_, v) => (isBigInt(v) ? v.toString() : v));
+export const stringify = (val: PlainValue): string => JSON.stringify(val);

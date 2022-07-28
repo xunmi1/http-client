@@ -95,15 +95,6 @@ describe('data', () => {
     expect(data).toBe(1);
   });
 
-  test('support bigint type', async () => {
-    const http = new HttpClient({ baseURL });
-    const url = '/data/bigint';
-    const max = BigInt(Number.MAX_VALUE);
-    startBodyServer(url);
-    const { data } = await http.post(url, { data: { a: max } });
-    expect(data).toEqual({ a: max.toString() });
-  });
-
   test('use body first', async () => {
     const http = new HttpClient({ baseURL });
     const url = '/data/request-body';
